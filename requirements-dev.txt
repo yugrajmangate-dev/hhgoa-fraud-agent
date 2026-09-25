@@ -1,0 +1,10 @@
+# Full local/TigerGraph development environment (Python 3.11.9).
+pandas==3.0.1
+pyarrow==23.0.1
+numpy==1.26.4
+jsonschema==4.26.0
+pyTigerGraph==2.0.4
+tigergraph-mcp==1.0.3
+mcp==2.2.0
+python-dotenv==1.2.3
+streamlit==1.64.0

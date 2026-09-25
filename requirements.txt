@@ -1,11 +1,7 @@
-# Pinned to the versions tested (Python 3.11.9, project virtualenv .venv).
-# scripts/inventory_dataset.py needs only the standard library.
+# Streamlit Community Cloud runtime dependencies (Python 3.14 compatible).
+# The deployed UI is read-only and renders committed cases + provenance bundles;
+# it does not connect to Savanna at runtime.
 pandas==3.0.1
 pyarrow==23.0.1
-numpy==1.26.4
-jsonschema==4.26.0
-pyTigerGraph==2.0.4
-tigergraph-mcp==1.0.3
-mcp==2.2.0
-python-dotenv==1.2.3
+numpy==2.3.5
 streamlit==1.64.0
