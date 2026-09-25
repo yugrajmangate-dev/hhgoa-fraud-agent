@@ -1,0 +1,14 @@
+# UI theme only (no logic). Read by `streamlit run ui/app.py` from the project root.
+[theme]
+base = "dark"
+primaryColor = "#3B82F6"
+backgroundColor = "#0B1220"
+secondaryBackgroundColor = "#111A2B"
+textColor = "#E5E7EB"
+font = "sans serif"
+
+[server]
+headless = true
+
+[browser]
+gatherUsageStats = false

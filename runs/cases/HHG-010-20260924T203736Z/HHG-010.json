@@ -1,0 +1,254 @@
+{
+  "case_id": "HHG-010",
+  "case": {
+    "status": "escalated",
+    "verdict": "uncertain",
+    "fraud_probability": 0.51,
+    "pattern": "undocumented",
+    "pattern_description": "One device profile (Windows | Windows 10 | edge 16.0 | 1366x768), new to each account and seen behind a proxy, is used for online purchases on at least 31 different customers' cards within 30 days. The activity looks like a shared-device ring rather than a single compromised card, and earlier closed cases on the same device were not matched to a documented typology. Found by expanding the card-device graph from the flagged transaction.",
+    "affected_txn_ids": [
+      "3506725"
+    ],
+    "first_suspicious_txn_id": "3506725",
+    "connected_card_ids": [
+      "C00854-K2",
+      "C01999-K2",
+      "C02231-K1",
+      "C02250-K2",
+      "C02280-K1",
+      "C03066-K1",
+      "C03169-K1",
+      "C03738-K2",
+      "C04024-K2",
+      "C04108-K2",
+      "C05244-K1",
+      "C05508-K1",
+      "C05625-K2",
+      "C06914-K1",
+      "C07185-K2",
+      "C07212-K2",
+      "C08269-K1",
+      "C08489-K2",
+      "C08918-K2",
+      "C09065-K1",
+      "C09241-K2",
+      "C09249-K1",
+      "C10149-K1",
+      "C10308-K1",
+      "C11000-K2"
+    ],
+    "connected_device_profiles": [],
+    "exposure_usd": 1000.03,
+    "evidence": [
+      {
+        "claim": "Bank model risk score on transaction 3506725 is 0.90 (an input, not a verdict; weight 0 in the evidence scorer)",
+        "source": "graph",
+        "ref": "query:get_transaction(as_of=2016-12-02 18:18:27, txn=3506725)#call-1",
+        "entity_ids": [
+          "3506725"
+        ]
+      },
+      {
+        "claim": "Device ring: 30 other customers' cards used the same fully specified device profile in the last 30 days, each with window transactions whose identity record marks the device New (contribution +0.29 logit)",
+        "source": "graph",
+        "ref": "query:shared_origin_scan(as_of=2016-12-02 18:18:27, card=C10434-K1, window_days=30, max_degree=50)#call-4",
+        "entity_ids": [
+          "C00854-K2",
+          "C01999-K2",
+          "C02231-K1",
+          "C02250-K2",
+          "C02280-K1",
+          "C03066-K1",
+          "C03169-K1",
+          "C03738-K2",
+          "C04024-K2",
+          "C04108-K2",
+          "C05244-K1",
+          "C05508-K1",
+          "C05625-K2",
+          "C06914-K1",
+          "C07185-K2",
+          "C07212-K2",
+          "C08269-K1",
+          "C08489-K2",
+          "C08918-K2",
+          "C09065-K1"
+        ]
+      },
+      {
+        "claim": "20 similar closed cases (lexical similarity ≥ 0.35): weighted fraud share 0.98 vs history base rate 0.84; patterns {'undocumented': 4, 'card_not_present_new_device': 14, 'card_not_present_fraud': 2} (contribution +0.00 logit)",
+        "source": "graph",
+        "ref": "query:similar_cases_vector(as_of=2016-12-02 18:18:27, qv=<51 values>, top_k=20)#call-8",
+        "entity_ids": [
+          "CC-2649",
+          "CC-2971",
+          "CC-2985",
+          "CC-3035",
+          "CC-4333"
+        ]
+      },
+      {
+        "claim": "Familiar aspects: product code used before; home billing region (contribution +0.00 logit)",
+        "source": "graph",
+        "ref": "query:card_history(as_of=2016-12-02 18:18:27, card=C10434-K1, lookback_days=180)#call-3",
+        "entity_ids": [
+          "3506725"
+        ]
+      },
+      {
+        "claim": "Simulated: no reply within 24 hours (pre-response probability 0.41 is between the 0.40 confirm and 0.60 deny thresholds)",
+        "source": "customer",
+        "ref": "evidence_request:1",
+        "entity_ids": [
+          "3506725"
+        ]
+      },
+      {
+        "claim": "Policy/pattern text retrieved: 3b. The next best action can change Recommend what the evidence supports now, then request more evidence if the policy calls for it, then recommend again. Example: probability 0.45 on a single signal, so the initial acti",
+        "source": "document",
+        "ref": "document:README#§3b",
+        "entity_ids": [
+          "policy-3b"
+        ]
+      },
+      {
+        "claim": "Policy/pattern text retrieved: \"3a. A case is not a report Two different things, and the agent produces both. **A case** (`CREATE_CASE`) is the bank's internal record of an investigation. Open one whenever fraud probability reaches 0.30, whenever you ",
+        "source": "document",
+        "ref": "document:README#§3a",
+        "entity_ids": [
+          "policy-3a"
+        ]
+      },
+      {
+        "claim": "Policy/pattern text retrieved: R4. No reply within 24 hours. Recommend `MONITOR_CARD` and `DECLINE_TRANSACTION` for pending authorizations. Escalate if exposure exceeds $500.",
+        "source": "document",
+        "ref": "document:README#R4",
+        "entity_ids": [
+          "policy-R4"
+        ]
+      }
+    ],
+    "similar_prior_cases": [
+      "CC-4890",
+      "CC-1034",
+      "CC-2720",
+      "CC-3219",
+      "CC-3549"
+    ],
+    "summary": "Alert on transaction 3506725 ($1,000.03, online) for card C10434-K1 was triggered by a bank model risk score of 0.90. Assessed fraud probability is 0.51; the evidence does not settle the question (leading hypothesis: an undocumented pattern). Key evidence: Device ring: 30 other customers' cards used the same fully specified device profile in the last 30 days, each with window transactions whose identity record marks the device New; 20 similar closed cases (lexical similarity ≥ 0.35): weighted fraud share 0.98 vs history base rate 0.84; patterns {'undocumented': 4, 'card_not_present_new_device': 14, 'card_not_present_fraud': 2}; Familiar aspects: product code used before; home billing region. A step up auth request was made and its response was simulated as 'no_reply'. Final actions: DECLINE_TRANSACTION, CREATE_CASE, FILE_REPORT, MONITOR_CARD, MONITOR_CONNECTED_CARDS, ESCALATE_TO_ANALYST.",
+    "written_to_graph": true,
+    "graph_case_id": "INV-HHG-010-e9c7b19878"
+  },
+  "evidence_requests": [
+    {
+      "type": "step_up_auth",
+      "asked_after_step": 10,
+      "assumed_response": "Simulated: no reply within 24 hours (pre-response probability 0.41 is between the 0.40 confirm and 0.60 deny thresholds)"
+    }
+  ],
+  "next_best_actions": {
+    "initial": [
+      {
+        "action": "STEP_UP_AUTH",
+        "route": "auto",
+        "reason": "R1: case rests on at most one signal and probability 0.41 < 0.70; verify before any block; §3b: evidence requested before the final recommendation"
+      },
+      {
+        "action": "CREATE_CASE",
+        "route": "auto",
+        "reason": "R6: 31 cards show fraud sharing DeviceProfile Windows | Windows 10 | edge 16.0 | 1366x768 within 30 days; R9: coordinated or repeated abuse across customers matching no documented pattern; §3a: evidence requested; §3a: a report always has a case behind it"
+      },
+      {
+        "action": "FILE_REPORT",
+        "route": "L2",
+        "reason": "R6: 31 cards show fraud sharing DeviceProfile Windows | Windows 10 | edge 16.0 | 1366x768 within 30 days; R9: coordinated or repeated abuse across customers matching no documented pattern"
+      },
+      {
+        "action": "MONITOR_CONNECTED_CARDS",
+        "route": "auto",
+        "reason": "R6: 31 cards show fraud sharing DeviceProfile Windows | Windows 10 | edge 16.0 | 1366x768 within 30 days"
+      },
+      {
+        "action": "ESCALATE_TO_ANALYST",
+        "route": "auto",
+        "reason": "R8: verdict uncertain and exposure $1,000.03 > $500; R9: coordinated or repeated abuse across customers matching no documented pattern"
+      }
+    ],
+    "final": [
+      {
+        "action": "DECLINE_TRANSACTION",
+        "route": "L1",
+        "reason": "R4: no reply within 24 hours; decline pending authorizations"
+      },
+      {
+        "action": "CREATE_CASE",
+        "route": "auto",
+        "reason": "R6: 31 cards show fraud sharing DeviceProfile Windows | Windows 10 | edge 16.0 | 1366x768 within 30 days; R9: coordinated or repeated abuse across customers matching no documented pattern; §3a: evidence requested; §3a: a report always has a case behind it"
+      },
+      {
+        "action": "FILE_REPORT",
+        "route": "L2",
+        "reason": "R6: 31 cards show fraud sharing DeviceProfile Windows | Windows 10 | edge 16.0 | 1366x768 within 30 days; R9: coordinated or repeated abuse across customers matching no documented pattern"
+      },
+      {
+        "action": "MONITOR_CARD",
+        "route": "auto",
+        "reason": "R4: no reply within 24 hours (simulated)"
+      },
+      {
+        "action": "MONITOR_CONNECTED_CARDS",
+        "route": "auto",
+        "reason": "R6: 31 cards show fraud sharing DeviceProfile Windows | Windows 10 | edge 16.0 | 1366x768 within 30 days"
+      },
+      {
+        "action": "ESCALATE_TO_ANALYST",
+        "route": "auto",
+        "reason": "R4: no reply and exposure $1,000.03 > $500; R8: verdict uncertain and exposure $1,000.03 > $500; R9: coordinated or repeated abuse across customers matching no documented pattern"
+      }
+    ],
+    "what_changed": "The simulated no reply response moved the fraud probability from 0.41 to 0.51 and the verdict to uncertain. Final actions add DECLINE_TRANSACTION, MONITOR_CARD and drop STEP_UP_AUTH."
+  },
+  "sar": {
+    "file": true,
+    "reason": "R6: 31 cards show fraud sharing DeviceProfile Windows | Windows 10 | edge 16.0 | 1366x768 within 30 days; R9: coordinated or repeated abuse across customers matching no documented pattern",
+    "narrative": "This report concerns customer C10434 and card C10434-K1. Between 2016-12-02 and 2016-12-02, 1 transaction(s) totalling $1,000.03 were identified as part of one suspicious episode (3506725). The activity was online (card not present) and the alert was raised by a bank model risk score of 0.90 on transaction 3506725. The activity is assessed as an undocumented pattern with a fraud probability of 0.51. Device ring: 30 other customers' cards used the same fully specified device profile in the last 30 days, each with window transactions whose identity record marks the device New. 20 similar closed cases (lexical similarity ≥ 0.35): weighted fraud share 0.98 vs history base rate 0.84; patterns {'undocumented': 4, 'card_not_present_new_device': 14, 'card_not_present_fraud': 2}. Familiar aspects: product code used before; home billing region. The same origin links this card to 25 other card(s): C00854-K2, C01999-K2, C02231-K1, C02250-K2, C02280-K1, C03066-K1. A simulated step up auth response was recorded as 'no_reply'. It is suspicious because Device ring: 30 other customers' cards used the same fully specified device profile in the last 30 days, each with window transactions whose identity record marks the device New; 20 similar closed cases (lexical similarity ≥ 0.35): weighted fraud share 0.98 vs history base rate 0.84; patterns {'undocumented': 4, 'card_not_present_new_device': 14, 'card_not_present_fraud': 2}. Recommended actions: DECLINE_TRANSACTION, CREATE_CASE, FILE_REPORT, MONITOR_CARD, MONITOR_CONNECTED_CARDS, ESCALATE_TO_ANALYST. All amounts are in USD; product codes and region codes are dataset codes, and no merchant identifiers exist in the data.",
+    "subjects": [
+      "C10434",
+      "C10434-K1",
+      "C00854-K2",
+      "C01999-K2",
+      "C02231-K1",
+      "C02250-K2",
+      "C02280-K1",
+      "C03066-K1",
+      "C03169-K1",
+      "C03738-K2",
+      "C04024-K2",
+      "C04108-K2",
+      "C05244-K1",
+      "C05508-K1",
+      "C05625-K2",
+      "C06914-K1",
+      "C07185-K2",
+      "C07212-K2",
+      "C08269-K1",
+      "C08489-K2",
+      "C08918-K2",
+      "C09065-K1",
+      "C09241-K2",
+      "C09249-K1",
+      "C10149-K1",
+      "C10308-K1",
+      "C11000-K2"
+    ],
+    "total_amount_usd": 1000.03,
+    "activity_dates": [
+      "2016-12-02",
+      "2016-12-02"
+    ]
+  },
+  "stop_reason": "No reply within 24 hours was assumed; policy R4 actions apply and the remaining uncertainty is handed on as recorded. Further automated steps are unlikely to change the decision.",
+  "tool_calls": 9,
+  "tokens": 0,
+  "latency_s": 8.46
+}

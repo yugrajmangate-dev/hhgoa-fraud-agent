@@ -1,0 +1,121 @@
+{
+  "case_id": "HHG-017",
+  "case": {
+    "status": "closed_legitimate",
+    "verdict": "legitimate",
+    "fraud_probability": 0.03,
+    "pattern": "none",
+    "pattern_description": "",
+    "affected_txn_ids": [],
+    "first_suspicious_txn_id": "",
+    "connected_card_ids": [],
+    "connected_device_profiles": [],
+    "exposure_usd": 0,
+    "evidence": [
+      {
+        "claim": "Bank model risk score on transaction 3450629 is 0.57 (an input, not a verdict; weight 0 in the evidence scorer)",
+        "source": "graph",
+        "ref": "query:get_transaction(as_of=2016-11-12 00:46:24, txn=3450629)#call-1",
+        "entity_ids": [
+          "3450629"
+        ]
+      },
+      {
+        "claim": "No shared device, region or recipient email links to other cards' visible fraud in 30 days (contribution +0.00 logit)",
+        "source": "graph",
+        "ref": "query:shared_origin_scan(as_of=2016-11-12 00:46:24, card=C04570-K1, window_days=30, max_degree=50)#call-4",
+        "entity_ids": []
+      },
+      {
+        "claim": "Familiar aspects: amount typical for the card; product code used before; device profile seen before on the card and marked Found (contribution +0.00 logit)",
+        "source": "graph",
+        "ref": "query:card_history(as_of=2016-11-12 00:46:24, card=C04570-K1, lookback_days=180)#call-3",
+        "entity_ids": [
+          "3450629"
+        ]
+      },
+      {
+        "claim": "Simulated: customer confirms they made transaction 3450629 (pre-response probability 0.34 ≤ 0.40 confirm threshold)",
+        "source": "customer",
+        "ref": "evidence_request:1",
+        "entity_ids": [
+          "3450629"
+        ]
+      },
+      {
+        "claim": "Policy/pattern text retrieved: R3. Customer confirms the transaction. Recommend `CLOSE_NO_FRAUD`. Note the confirmation in the case file.",
+        "source": "document",
+        "ref": "document:README#R3",
+        "entity_ids": [
+          "policy-R3"
+        ]
+      },
+      {
+        "claim": "Policy/pattern text retrieved: 3b. The next best action can change Recommend what the evidence supports now, then request more evidence if the policy calls for it, then recommend again. Example: probability 0.45 on a single signal, so the initial acti",
+        "source": "document",
+        "ref": "document:README#§3b",
+        "entity_ids": [
+          "policy-3b"
+        ]
+      },
+      {
+        "claim": "Policy/pattern text retrieved: R1. Verify before you block on a weak signal. If the case rests on a single signal (including a risk score alone) and your assessed fraud probability is below 0.70, recommend `VERIFY_WITH_CUSTOMER` or `STEP_UP_AUTH` befo",
+        "source": "document",
+        "ref": "document:README#R1",
+        "entity_ids": [
+          "policy-R1"
+        ]
+      }
+    ],
+    "similar_prior_cases": [],
+    "summary": "Alert on transaction 3450629 ($100.09, online) for card C04570-K1 was triggered by a bank model risk score of 0.57. Assessed fraud probability is 0.03; the activity is judged legitimate. Key evidence: No shared device, region or recipient email links to other cards' visible fraud in 30 days; Familiar aspects: amount typical for the card; product code used before; device profile seen before on the card and marked Found. A customer validation request was made and its response was simulated as 'confirm'. Final actions: CREATE_CASE, CLOSE_NO_FRAUD.",
+    "written_to_graph": true,
+    "graph_case_id": "INV-HHG-017-0e29f8b20a"
+  },
+  "evidence_requests": [
+    {
+      "type": "customer_validation",
+      "asked_after_step": 10,
+      "assumed_response": "Simulated: customer confirms they made transaction 3450629 (pre-response probability 0.34 ≤ 0.40 confirm threshold)"
+    }
+  ],
+  "next_best_actions": {
+    "initial": [
+      {
+        "action": "VERIFY_WITH_CUSTOMER",
+        "route": "auto",
+        "reason": "R1: case rests on at most one signal and probability 0.34 < 0.70; verify before any block; §3b: evidence requested before the final recommendation"
+      },
+      {
+        "action": "CREATE_CASE",
+        "route": "auto",
+        "reason": "§3a: evidence requested"
+      }
+    ],
+    "final": [
+      {
+        "action": "CREATE_CASE",
+        "route": "auto",
+        "reason": "§3a: evidence requested"
+      },
+      {
+        "action": "CLOSE_NO_FRAUD",
+        "route": "auto",
+        "reason": "R3: customer confirmed the transaction (simulated response); noted in case file; R3"
+      }
+    ],
+    "what_changed": "The simulated confirm response moved the fraud probability from 0.34 to 0.03 and the verdict to legitimate. Final actions add CLOSE_NO_FRAUD and drop VERIFY_WITH_CUSTOMER."
+  },
+  "sar": {
+    "file": false,
+    "reason": "§3a: no report; fraud is not confirmed or strongly suspected together with exposure over $1,000, a shared origin, or an undocumented coordinated pattern",
+    "narrative": "",
+    "subjects": [],
+    "total_amount_usd": 0,
+    "activity_dates": []
+  },
+  "stop_reason": "The simulated verification response settled the question (README §6); probability 0.03. Further steps would not change the actions.",
+  "tool_calls": 8,
+  "tokens": 0,
+  "latency_s": 4.12
+}

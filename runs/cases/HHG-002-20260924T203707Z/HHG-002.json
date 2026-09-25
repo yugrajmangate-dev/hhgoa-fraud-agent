@@ -1,0 +1,150 @@
+{
+  "case_id": "HHG-002",
+  "case": {
+    "status": "open",
+    "verdict": "uncertain",
+    "fraud_probability": 0.64,
+    "pattern": "card_not_present_fraud",
+    "pattern_description": "",
+    "affected_txn_ids": [
+      "3478782"
+    ],
+    "first_suspicious_txn_id": "3478782",
+    "connected_card_ids": [],
+    "connected_device_profiles": [],
+    "exposure_usd": 292.36,
+    "evidence": [
+      {
+        "claim": "Bank model risk score on transaction 3478782 is 0.79 (an input, not a verdict; weight 0 in the evidence scorer)",
+        "source": "graph",
+        "ref": "query:get_transaction(as_of=2016-11-22 23:27:07, txn=3478782)#call-1",
+        "entity_ids": [
+          "3478782"
+        ]
+      },
+      {
+        "claim": "No shared device, region or recipient email links to other cards' visible fraud in 30 days (contribution +0.00 logit)",
+        "source": "graph",
+        "ref": "query:shared_origin_scan(as_of=2016-11-22 23:27:07, card=C11891-K1, window_days=30, max_degree=50)#call-4",
+        "entity_ids": []
+      },
+      {
+        "claim": "1 earlier confirmed-fraud closed case(s) on this card, closed before the alert (contribution +0.82 logit)",
+        "source": "graph",
+        "ref": "query:case_history(as_of=2016-11-22 23:27:07, customer=C11891)#call-5",
+        "entity_ids": [
+          "CC-4160"
+        ]
+      },
+      {
+        "claim": "20 similar closed cases (lexical similarity ≥ 0.35): weighted fraud share 0.98 vs history base rate 0.84; patterns {'card_not_present_fraud': 20} (contribution +0.00 logit)",
+        "source": "graph",
+        "ref": "query:similar_cases_vector(as_of=2016-11-22 23:27:07, qv=<21 values>, top_k=20)#call-7",
+        "entity_ids": [
+          "CC-0312",
+          "CC-0542",
+          "CC-4551",
+          "CC-4960",
+          "CC-4983"
+        ]
+      },
+      {
+        "claim": "Familiar aspects: product code used before (contribution +0.00 logit)",
+        "source": "graph",
+        "ref": "query:card_history(as_of=2016-11-22 23:27:07, card=C11891-K1, lookback_days=180)#call-3",
+        "entity_ids": [
+          "3478782"
+        ]
+      },
+      {
+        "claim": "Simulated: no reply within 24 hours (pre-response probability 0.54 is between the 0.40 confirm and 0.60 deny thresholds)",
+        "source": "customer",
+        "ref": "evidence_request:1",
+        "entity_ids": [
+          "3478782"
+        ]
+      },
+      {
+        "claim": "Policy/pattern text retrieved: 2. Card-not-present fraud. The number is used online without the card. Amounts and products that don't fit the cardholder's history, often in a burst of two to four within 48 hours. On its own, one unusual online purchas",
+        "source": "document",
+        "ref": "document:README#card_not_present_fraud",
+        "entity_ids": [
+          "pattern-card_not_present_fraud"
+        ]
+      },
+      {
+        "claim": "Policy/pattern text retrieved: R4. No reply within 24 hours. Recommend `MONITOR_CARD` and `DECLINE_TRANSACTION` for pending authorizations. Escalate if exposure exceeds $500.",
+        "source": "document",
+        "ref": "document:README#R4",
+        "entity_ids": [
+          "policy-R4"
+        ]
+      },
+      {
+        "claim": "Policy/pattern text retrieved: 3b. The next best action can change Recommend what the evidence supports now, then request more evidence if the policy calls for it, then recommend again. Example: probability 0.45 on a single signal, so the initial acti",
+        "source": "document",
+        "ref": "document:README#§3b",
+        "entity_ids": [
+          "policy-3b"
+        ]
+      }
+    ],
+    "similar_prior_cases": [
+      "CC-4160"
+    ],
+    "summary": "Alert on transaction 3478782 ($292.36, online) for card C11891-K1 was triggered by a bank model risk score of 0.79. Assessed fraud probability is 0.64; the evidence does not settle the question (leading hypothesis: card-not-present fraud). Key evidence: No shared device, region or recipient email links to other cards' visible fraud in 30 days; 1 earlier confirmed-fraud closed case(s) on this card, closed before the alert; 20 similar closed cases (lexical similarity ≥ 0.35): weighted fraud share 0.98 vs history base rate 0.84; patterns {'card_not_present_fraud': 20}. A customer validation request was made and its response was simulated as 'no_reply'. Final actions: DECLINE_TRANSACTION, CREATE_CASE, MONITOR_CARD.",
+    "written_to_graph": true,
+    "graph_case_id": "INV-HHG-002-c5794d8ace"
+  },
+  "evidence_requests": [
+    {
+      "type": "customer_validation",
+      "asked_after_step": 10,
+      "assumed_response": "Simulated: no reply within 24 hours (pre-response probability 0.54 is between the 0.40 confirm and 0.60 deny thresholds)"
+    }
+  ],
+  "next_best_actions": {
+    "initial": [
+      {
+        "action": "VERIFY_WITH_CUSTOMER",
+        "route": "auto",
+        "reason": "R1: case rests on at most one signal and probability 0.54 < 0.70; verify before any block; §3b: evidence requested before the final recommendation"
+      },
+      {
+        "action": "CREATE_CASE",
+        "route": "auto",
+        "reason": "§3a: evidence requested"
+      }
+    ],
+    "final": [
+      {
+        "action": "DECLINE_TRANSACTION",
+        "route": "L1",
+        "reason": "R4: no reply within 24 hours; decline pending authorizations"
+      },
+      {
+        "action": "CREATE_CASE",
+        "route": "auto",
+        "reason": "§3a: evidence requested"
+      },
+      {
+        "action": "MONITOR_CARD",
+        "route": "auto",
+        "reason": "R4: no reply within 24 hours (simulated)"
+      }
+    ],
+    "what_changed": "The simulated no reply response moved the fraud probability from 0.54 to 0.64 and the verdict to uncertain. Final actions add DECLINE_TRANSACTION, MONITOR_CARD and drop VERIFY_WITH_CUSTOMER."
+  },
+  "sar": {
+    "file": false,
+    "reason": "§3a: no report; fraud is not confirmed or strongly suspected together with exposure over $1,000, a shared origin, or an undocumented coordinated pattern",
+    "narrative": "",
+    "subjects": [],
+    "total_amount_usd": 0,
+    "activity_dates": []
+  },
+  "stop_reason": "No reply within 24 hours was assumed; policy R4 actions apply and the remaining uncertainty is handed on as recorded. Further automated steps are unlikely to change the decision.",
+  "tool_calls": 8,
+  "tokens": 0,
+  "latency_s": 4.19
+}

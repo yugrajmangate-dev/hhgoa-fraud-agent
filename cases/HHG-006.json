@@ -1,0 +1,173 @@
+{
+  "case_id": "HHG-006",
+  "case": {
+    "status": "escalated",
+    "verdict": "fraud",
+    "fraud_probability": 0.97,
+    "pattern": "undocumented",
+    "pattern_description": "Repeated online purchases on one card within an hour, each just under a round $500 amount, apparently chosen to stay under an authorization threshold. It matches none of the five documented patterns; similar closed cases on other customers show the same structure. Found by scanning the card's visible transactions for clustered near-threshold amounts.",
+    "affected_txn_ids": [
+      "3476602",
+      "3476633",
+      "3476665",
+      "3476682"
+    ],
+    "first_suspicious_txn_id": "3476602",
+    "connected_card_ids": [],
+    "connected_device_profiles": [],
+    "exposure_usd": 1906.07,
+    "evidence": [
+      {
+        "claim": "Customer message in the alert: Customer C07297 message: 'I never made this $482.12 purchase. Please check my card.' Refers to 3476682.",
+        "source": "customer",
+        "ref": "case_pack:HHG-006.trigger_text",
+        "entity_ids": [
+          "3476682",
+          "C07297"
+        ]
+      },
+      {
+        "claim": "Bank model risk score on transaction 3476682 is 0.25 (an input, not a verdict; weight 0 in the evidence scorer)",
+        "source": "graph",
+        "ref": "query:get_transaction(as_of=2016-11-22 02:30:00, txn=3476682)#call-1",
+        "entity_ids": [
+          "3476682"
+        ]
+      },
+      {
+        "claim": "Product code C never used on this card before (contribution +0.45 logit)",
+        "source": "graph",
+        "ref": "query:card_history(as_of=2016-11-22 02:30:00, card=C07297-K1, lookback_days=180)#call-3",
+        "entity_ids": [
+          "3476682"
+        ]
+      },
+      {
+        "claim": "4 online transactions on the card in the 48 hours up to the alert (about 0.0 expected from the card's visible history) (contribution +0.66 logit)",
+        "source": "graph",
+        "ref": "query:card_history(as_of=2016-11-22 02:30:00, card=C07297-K1, lookback_days=180)#call-3",
+        "entity_ids": [
+          "3476602",
+          "3476633",
+          "3476665",
+          "3476682"
+        ]
+      },
+      {
+        "claim": "4 online purchases within 60 minutes each just under $500.00 ($478.95, $456.96, $488.04, $482.12), consistent with staying under an authorization threshold (contribution +2.00 logit)",
+        "source": "graph",
+        "ref": "query:card_history(as_of=2016-11-22 02:30:00, card=C07297-K1, lookback_days=180)#call-3",
+        "entity_ids": [
+          "3476602",
+          "3476633",
+          "3476665",
+          "3476682"
+        ]
+      },
+      {
+        "claim": "No shared device, region or recipient email links to other cards' visible fraud in 30 days (contribution +0.00 logit)",
+        "source": "graph",
+        "ref": "query:shared_origin_scan(as_of=2016-11-22 02:30:00, card=C07297-K1, window_days=30, max_degree=50)#call-4",
+        "entity_ids": []
+      },
+      {
+        "claim": "17 similar closed cases (lexical similarity ≥ 0.35): weighted fraud share 0.98 vs history base rate 0.84; patterns {'card_not_present_new_device': 10, 'undocumented': 5, 'card_not_present_fraud': 2} (contribution +0.00 logit)",
+        "source": "graph",
+        "ref": "query:similar_cases_vector(as_of=2016-11-22 02:30:00, qv=<54 values>, top_k=20)#call-8",
+        "entity_ids": [
+          "CC-1697",
+          "CC-1740",
+          "CC-2338",
+          "CC-3907",
+          "CC-4086"
+        ]
+      },
+      {
+        "claim": "Familiar aspects: home billing region (contribution +0.00 logit)",
+        "source": "graph",
+        "ref": "query:card_history(as_of=2016-11-22 02:30:00, card=C07297-K1, lookback_days=180)#call-3",
+        "entity_ids": [
+          "3476682"
+        ]
+      },
+      {
+        "claim": "Policy/pattern text retrieved: \"3a. A case is not a report Two different things, and the agent produces both. **A case** (`CREATE_CASE`) is the bank's internal record of an investigation. Open one whenever fraud probability reaches 0.30, whenever you ",
+        "source": "document",
+        "ref": "document:README#§3a",
+        "entity_ids": [
+          "policy-3a"
+        ]
+      }
+    ],
+    "similar_prior_cases": [],
+    "summary": "Alert on transaction 3476682 ($482.12, online) for card C07297-K1 was triggered by a customer report disputing the transaction. Assessed fraud probability is 0.97; the activity is judged fraud (an undocumented pattern) covering 4 transaction(s) and $1,906.07. Key evidence: Product code C never used on this card before; 4 online transactions on the card in the 48 hours up to the alert (about 0.0 expected from the card's visible history); 4 online purchases within 60 minutes each just under $500.00 ($478.95, $456.96, $488.04, $482.12), consistent with staying under an authorization threshold. Final actions: BLOCK_CARD, CREATE_CASE, FILE_REPORT, ESCALATE_TO_ANALYST.",
+    "written_to_graph": true,
+    "graph_case_id": "INV-HHG-006-e8b694b277"
+  },
+  "evidence_requests": [],
+  "next_best_actions": {
+    "initial": [
+      {
+        "action": "BLOCK_CARD",
+        "route": "L1",
+        "reason": "R2: customer disputes the transaction in the alert; exposure $1,906.07 ≤ $2,500; §6: probability 0.97 ≥ 0.85 with 4 independent signals; R1 does not apply; exposure $1,906.07"
+      },
+      {
+        "action": "CREATE_CASE",
+        "route": "auto",
+        "reason": "R2: customer disputes the transaction in the alert; R9: coordinated or repeated abuse across customers matching no documented pattern; §6/§3a: probability 0.97 ≥ 0.30; §3a: customer dispute; §3a: a report always has a case behind it"
+      },
+      {
+        "action": "FILE_REPORT",
+        "route": "L2",
+        "reason": "R2: exposure $1,906.07 > $1,000; R9: coordinated or repeated abuse across customers matching no documented pattern; §3a: fraud strongly suspected and exposure $1,906.07 > $1,000"
+      },
+      {
+        "action": "ESCALATE_TO_ANALYST",
+        "route": "auto",
+        "reason": "R9: coordinated or repeated abuse across customers matching no documented pattern"
+      }
+    ],
+    "final": [
+      {
+        "action": "BLOCK_CARD",
+        "route": "L1",
+        "reason": "R2: customer disputes the transaction in the alert; exposure $1,906.07 ≤ $2,500; §6: probability 0.97 ≥ 0.85 with 4 independent signals; R1 does not apply; exposure $1,906.07"
+      },
+      {
+        "action": "CREATE_CASE",
+        "route": "auto",
+        "reason": "R2: customer disputes the transaction in the alert; R9: coordinated or repeated abuse across customers matching no documented pattern; §6/§3a: probability 0.97 ≥ 0.30; §3a: customer dispute; §3a: a report always has a case behind it"
+      },
+      {
+        "action": "FILE_REPORT",
+        "route": "L2",
+        "reason": "R2: exposure $1,906.07 > $1,000; R9: coordinated or repeated abuse across customers matching no documented pattern; §3a: fraud strongly suspected and exposure $1,906.07 > $1,000"
+      },
+      {
+        "action": "ESCALATE_TO_ANALYST",
+        "route": "auto",
+        "reason": "R9: coordinated or repeated abuse across customers matching no documented pattern"
+      }
+    ],
+    "what_changed": "nothing"
+  },
+  "sar": {
+    "file": true,
+    "reason": "R2: exposure $1,906.07 > $1,000; R9: coordinated or repeated abuse across customers matching no documented pattern; §3a: fraud strongly suspected and exposure $1,906.07 > $1,000",
+    "narrative": "This report concerns customer C07297 and card C07297-K1. Between 2016-11-21 and 2016-11-21, 4 transaction(s) totalling $1,906.07 were identified as part of one suspicious episode (3476602, 3476633, 3476665, 3476682). The activity was online (card not present) and the alert was raised by a customer report disputing the transaction on transaction 3476682. The activity is assessed as an undocumented pattern with a fraud probability of 0.97. Product code C never used on this card before. 4 online transactions on the card in the 48 hours up to the alert (about 0.0 expected from the card's visible history). 4 online purchases within 60 minutes each just under $500.00 ($478.95, $456.96, $488.04, $482.12), consistent with staying under an authorization threshold. It is suspicious because Product code C never used on this card before; 4 online transactions on the card in the 48 hours up to the alert (about 0.0 expected from the card's visible history). Recommended actions: BLOCK_CARD, CREATE_CASE, FILE_REPORT, ESCALATE_TO_ANALYST. All amounts are in USD; product codes and region codes are dataset codes, and no merchant identifiers exist in the data.",
+    "subjects": [
+      "C07297",
+      "C07297-K1"
+    ],
+    "total_amount_usd": 1906.07,
+    "activity_dates": [
+      "2016-11-21",
+      "2016-11-21"
+    ]
+  },
+  "stop_reason": "Stopping rule met: probability 0.97 with 4 independent pieces of evidence (README §6); further steps would not change the decision.",
+  "tool_calls": 9,
+  "tokens": 0,
+  "latency_s": 3.89
+}

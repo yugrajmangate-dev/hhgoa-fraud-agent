@@ -1,0 +1,58 @@
+// FraudGraph schema, Phase 1 (fraudgraph-p1-v1). ARCHITECTURE.md §2 with the Phase 1
+// attribute subset. No attribute stores an all-time aggregate (design rule S1).
+// The graph itself is created by hhg.graph.admin (CREATE GRAPH FraudGraph()) if missing.
+// Edge KC_DESCRIBES avoids the workspace's global edge type DESCRIBES.
+// 'proxy' is renamed 'proxy_type': GSQL 4.2.5 rejects 'proxy' after 'new_found'.
+USE GRAPH FraudGraph
+CREATE SCHEMA_CHANGE JOB fraudgraph_p1_v1 FOR GRAPH FraudGraph {
+  ADD VERTEX Customer (PRIMARY_ID customer_id STRING) WITH primary_id_as_attribute="true";
+  ADD VERTEX Card (PRIMARY_ID card_id STRING, customer_id STRING, card6 STRING, derivation_rule STRING) WITH primary_id_as_attribute="true";
+  ADD VERTEX Transaction (PRIMARY_ID txn_id STRING, ts DATETIME, amt DOUBLE, product_cd STRING, channel STRING,
+      risk_score DOUBLE, card4 STRING, card6 STRING, addr1 STRING, addr2 STRING, p_email STRING, r_email STRING,
+      dist1 DOUBLE, m1 STRING, m2 STRING, m3 STRING, m4 STRING, m5 STRING, m6 STRING, m7 STRING, m8 STRING, m9 STRING,
+      has_identity BOOL, device_type STRING, device_info STRING, os STRING, browser STRING, screen STRING,
+      new_found STRING, proxy_type STRING, match_status STRING, profile_key STRING) WITH primary_id_as_attribute="true";
+  ADD VERTEX DeviceProfile (PRIMARY_ID profile_key STRING, device_info STRING, os STRING, browser STRING, screen STRING, completeness INT) WITH primary_id_as_attribute="true";
+  ADD VERTEX EmailDomain (PRIMARY_ID domain STRING) WITH primary_id_as_attribute="true";
+  ADD VERTEX BillingRegion (PRIMARY_ID addr1 STRING) WITH primary_id_as_attribute="true";
+  ADD VERTEX ClosedCase (PRIMARY_ID case_id STRING, customer_id STRING, card_id STRING, opened_at DATETIME, closed_at DATETIME,
+      outcome STRING, pattern STRING, n_txns INT, exposure_usd DOUBLE, actions_taken LIST<STRING>, report_filed BOOL,
+      analyst_notes STRING, embedding LIST<DOUBLE>) WITH primary_id_as_attribute="true";
+  ADD VERTEX InvestigationCase (PRIMARY_ID graph_case_id STRING, case_id STRING, run_id STRING, case_as_of DATETIME,
+      status STRING, verdict STRING, fraud_probability DOUBLE, pattern STRING, pattern_description STRING, summary STRING,
+      exposure_usd DOUBLE, sar_file BOOL, answer_json STRING, answer_sha256 STRING, policy_version STRING,
+      scorer_version STRING, data_manifest_sha256 STRING, superseded BOOL, simulated BOOL, created_wall STRING,
+      embedding LIST<DOUBLE>) WITH primary_id_as_attribute="true";
+  ADD VERTEX EvidenceItem (PRIMARY_ID evidence_id STRING, claim STRING, source STRING, ref STRING, ordinal INT) WITH primary_id_as_attribute="true";
+  ADD VERTEX ActionRecommendation (PRIMARY_ID action_rec_id STRING, phase STRING, ordinal INT, action STRING, route STRING,
+      reason STRING, execution STRING) WITH primary_id_as_attribute="true";
+  ADD VERTEX KnowledgeChunk (PRIMARY_ID chunk_id STRING, source STRING, section STRING, text STRING, url STRING,
+      sha256 STRING, embedding LIST<DOUBLE>) WITH primary_id_as_attribute="true";
+  ADD VERTEX PolicyRule (PRIMARY_ID rule_id STRING) WITH primary_id_as_attribute="true";
+  ADD VERTEX FraudPattern (PRIMARY_ID name STRING) WITH primary_id_as_attribute="true";
+  ADD VERTEX DatasetMeta (PRIMARY_ID meta_id STRING, raw_manifest_sha256 STRING, card_rule_version STRING,
+      embedding_model STRING, schema_version STRING, loaded_at STRING) WITH primary_id_as_attribute="true";
+
+  ADD DIRECTED EDGE OWNS (FROM Customer, TO Card) WITH REVERSE_EDGE="rev_OWNS";
+  ADD DIRECTED EDGE MADE (FROM Card, TO Transaction) WITH REVERSE_EDGE="rev_MADE";
+  ADD DIRECTED EDGE FROM_DEVICE (FROM Transaction, TO DeviceProfile) WITH REVERSE_EDGE="rev_FROM_DEVICE";
+  ADD DIRECTED EDGE PURCHASER_EMAIL (FROM Transaction, TO EmailDomain) WITH REVERSE_EDGE="rev_PURCHASER_EMAIL";
+  ADD DIRECTED EDGE RECIPIENT_EMAIL (FROM Transaction, TO EmailDomain) WITH REVERSE_EDGE="rev_RECIPIENT_EMAIL";
+  ADD DIRECTED EDGE BILLED_IN (FROM Transaction, TO BillingRegion, addr2 STRING) WITH REVERSE_EDGE="rev_BILLED_IN";
+  ADD DIRECTED EDGE NEXT (FROM Transaction, TO Transaction, gap_seconds INT) WITH REVERSE_EDGE="rev_NEXT";
+  ADD DIRECTED EDGE INVOLVES (FROM ClosedCase, TO Transaction | FROM InvestigationCase, TO Transaction) WITH REVERSE_EDGE="rev_INVOLVES";
+  ADD DIRECTED EDGE ON_CARD (FROM ClosedCase, TO Card | FROM InvestigationCase, TO Card) WITH REVERSE_EDGE="rev_ON_CARD";
+  ADD DIRECTED EDGE CONNECTED_TO (FROM ClosedCase, TO Card | FROM InvestigationCase, TO Card) WITH REVERSE_EDGE="rev_CONNECTED_TO";
+  ADD DIRECTED EDGE FIRST_FRAUD (FROM ClosedCase, TO Transaction | FROM InvestigationCase, TO Transaction) WITH REVERSE_EDGE="rev_FIRST_FRAUD";
+  ADD DIRECTED EDGE HAS_PATTERN (FROM ClosedCase, TO FraudPattern | FROM InvestigationCase, TO FraudPattern) WITH REVERSE_EDGE="rev_HAS_PATTERN";
+  ADD DIRECTED EDGE FLAGGED (FROM InvestigationCase, TO Transaction) WITH REVERSE_EDGE="rev_FLAGGED";
+  ADD DIRECTED EDGE NAMES_DEVICE (FROM InvestigationCase, TO DeviceProfile) WITH REVERSE_EDGE="rev_NAMES_DEVICE";
+  ADD DIRECTED EDGE SIMILAR_TO (FROM InvestigationCase, TO ClosedCase | FROM InvestigationCase, TO InvestigationCase, score DOUBLE, method STRING) WITH REVERSE_EDGE="rev_SIMILAR_TO";
+  ADD DIRECTED EDGE HAS_EVIDENCE (FROM InvestigationCase, TO EvidenceItem) WITH REVERSE_EDGE="rev_HAS_EVIDENCE";
+  ADD DIRECTED EDGE EVIDENCE_ABOUT (FROM EvidenceItem, TO Transaction | FROM EvidenceItem, TO Card | FROM EvidenceItem, TO Customer | FROM EvidenceItem, TO DeviceProfile | FROM EvidenceItem, TO BillingRegion | FROM EvidenceItem, TO EmailDomain | FROM EvidenceItem, TO ClosedCase | FROM EvidenceItem, TO InvestigationCase) WITH REVERSE_EDGE="rev_EVIDENCE_ABOUT";
+  ADD DIRECTED EDGE HAS_ACTION (FROM InvestigationCase, TO ActionRecommendation) WITH REVERSE_EDGE="rev_HAS_ACTION";
+  ADD DIRECTED EDGE CITES_RULE (FROM ActionRecommendation, TO PolicyRule) WITH REVERSE_EDGE="rev_CITES_RULE";
+  ADD DIRECTED EDGE SUPERSEDES (FROM InvestigationCase, TO InvestigationCase) WITH REVERSE_EDGE="rev_SUPERSEDES";
+  ADD DIRECTED EDGE KC_DESCRIBES (FROM KnowledgeChunk, TO PolicyRule | FROM KnowledgeChunk, TO FraudPattern) WITH REVERSE_EDGE="rev_KC_DESCRIBES";
+}
+RUN SCHEMA_CHANGE JOB fraudgraph_p1_v1

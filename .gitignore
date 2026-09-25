@@ -1,0 +1,29 @@
+# Official dataset lives in data/raw/: never commit anything under data/ except .gitkeep
+data/*
+!data/.gitkeep
+# Downloaded dataset archives (e.g. HHGOA_IEEE.zip) are never committed either
+/*.zip
+
+# reports/ is tracked: it holds reconnaissance deliverables (data dictionary, validation,
+# column profile, inventory) with aggregate statistics only, never raw rows.
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Build logs contain the workspace host from server messages
+/runs/build/
+
+# Local execution traces and benchmark runs are not needed for deployment or judging
+/runs/
+
+# Local agent/editor metadata
+/.agents/
+/.claude/

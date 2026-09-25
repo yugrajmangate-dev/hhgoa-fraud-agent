@@ -1,0 +1,912 @@
+{
+ "case": {
+  "case_id": "HHG-010",
+  "opened_at": "2016-12-02 18:18:27",
+  "trigger_type": "risk_score",
+  "trigger_text": "Real-time model scored transaction 3506725 ($1,000.03, online) at 0.90. Review and decide.",
+  "flagged_txn_id": "3506725",
+  "card_id": "C10434-K1",
+  "customer_id": "C10434",
+  "risk_score": "0.90"
+ },
+ "as_of": "2016-12-02 18:18:27",
+ "run_id": "HHG-010-20260924T203736Z",
+ "states": [
+  {
+   "state": "INIT",
+   "step": 1,
+   "as_of": "2016-12-02 18:18:27",
+   "trigger_type": "risk_score",
+   "llm": "off"
+  },
+  {
+   "state": "TRIAGE",
+   "step": 2
+  },
+  {
+   "state": "CONTEXT",
+   "step": 3
+  },
+  {
+   "state": "PATTERN_SCAN",
+   "step": 4
+  },
+  {
+   "state": "NETWORK",
+   "step": 5
+  },
+  {
+   "state": "MEMORY",
+   "step": 6
+  },
+  {
+   "state": "ASSESS",
+   "step": 7,
+   "signature": "Online purchases; inconsistent with the cardholder's usual merchants and amounts; from a device not previously seen on this account; other cardholders reported the same device profile this month."
+  },
+  {
+   "state": "DECIDE_INITIAL",
+   "step": 8,
+   "p": 0.41,
+   "verdict": "uncertain",
+   "pattern": "undocumented",
+   "stop_rule": false
+  },
+  {
+   "state": "EVIDENCE_GATE",
+   "step": 9,
+   "request": true
+  },
+  {
+   "state": "REQUEST_EVIDENCE",
+   "step": 10
+  },
+  {
+   "state": "SIMULATE_RESPONSE",
+   "step": 11
+  },
+  {
+   "state": "REASSESS",
+   "step": 12,
+   "response": "no_reply"
+  },
+  {
+   "state": "DECIDE_FINAL",
+   "step": 13
+  },
+  {
+   "state": "NARRATE",
+   "step": 14,
+   "mode": "template"
+  },
+  {
+   "state": "VALIDATE",
+   "step": 15
+  },
+  {
+   "state": "PERSIST",
+   "step": 16
+  }
+ ],
+ "families": {
+  "F1_amount": {
+   "name": "F1_amount",
+   "s": 0.7015301190490059,
+   "available": true,
+   "entities": [
+    "3506725"
+   ],
+   "claim": "Flagged amount $1,000.03 vs card median $68.98 over 33 earlier visible transactions (robust z = 4.1)",
+   "refs": [
+    "query:card_history(as_of=2016-12-02 18:18:27, card=C10434-K1, lookback_days=180)#call-3"
+   ],
+   "detail": {
+    "z": 4.1,
+    "median_amt": 68.98,
+    "n_base": 33
+   }
+  },
+  "F2_product": {
+   "name": "F2_product",
+   "s": 0.0,
+   "available": true,
+   "entities": [
+    "3506725"
+   ],
+   "claim": "Product code R used 9 times before on this card",
+   "refs": [
+    "query:card_history(as_of=2016-12-02 18:18:27, card=C10434-K1, lookback_days=180)#call-3"
+   ],
+   "detail": {
+    "product_cd": "R",
+    "seen": {
+     "W": 17,
+     "H": 7,
+     "R": 9
+    }
+   }
+  },
+  "F3_burst": {
+   "name": "F3_burst",
+   "s": 0.0,
+   "available": true,
+   "entities": [
+    "3506725"
+   ],
+   "claim": "1 online transactions on the card in the 48 hours up to the alert (about 0.2 expected from the card's visible history)",
+   "refs": [
+    "query:card_history(as_of=2016-12-02 18:18:27, card=C10434-K1, lookback_days=180)#call-3"
+   ],
+   "detail": {
+    "n_online_48h": 1,
+    "expected_48h": 0.22
+   }
+  },
+  "F4_device": {
+   "name": "F4_device",
+   "s": 0.6,
+   "available": true,
+   "entities": [
+    "3506725"
+   ],
+   "claim": "Device profile 'Windows | Windows 10 | edge 16.0 | 1366x768': identity marks it New; not seen on this card before",
+   "refs": [
+    "query:card_history(as_of=2016-12-02 18:18:27, card=C10434-K1, lookback_days=180)#call-3"
+   ],
+   "detail": {
+    "profile": "Windows | Windows 10 | edge 16.0 | 1366x768",
+    "id_15": "New",
+    "proxy": "",
+    "new_to_card": true,
+    "familiar": false
+   }
+  },
+  "F6_testing": {
+   "name": "F6_testing",
+   "s": 0.0,
+   "available": true,
+   "entities": [],
+   "claim": "No card-testing sequence (3+ small online authorizations within an hour, then a larger purchase)",
+   "refs": [
+    "query:card_history(as_of=2016-12-02 18:18:27, card=C10434-K1, lookback_days=180)#call-3"
+   ],
+   "detail": {}
+  },
+  "F7_takeover": {
+   "name": "F7_takeover",
+   "s": 0.0,
+   "available": true,
+   "entities": [
+    "3506725"
+   ],
+   "claim": "No credential anomalies found",
+   "refs": [
+    "query:card_history(as_of=2016-12-02 18:18:27, card=C10434-K1, lookback_days=180)#call-3"
+   ],
+   "detail": {
+    "anomalies": []
+   }
+  },
+  "F13_recurring": {
+   "name": "F13_recurring",
+   "s": 0.0,
+   "available": true,
+   "entities": [
+    "3506725"
+   ],
+   "claim": "No monthly recurring charge matching the flagged amount",
+   "refs": [
+    "query:card_history(as_of=2016-12-02 18:18:27, card=C10434-K1, lookback_days=180)#call-3"
+   ],
+   "detail": {
+    "matches": [],
+    "gaps_days": []
+   }
+  },
+  "F15_structuring": {
+   "name": "F15_structuring",
+   "s": 0.0,
+   "available": true,
+   "entities": [],
+   "claim": "No repeated purchases just under a round threshold",
+   "refs": [
+    "query:card_history(as_of=2016-12-02 18:18:27, card=C10434-K1, lookback_days=180)#call-3"
+   ],
+   "detail": {}
+  },
+  "F5_region": {
+   "name": "F5_region",
+   "s": 0.0,
+   "available": true,
+   "entities": [
+    "3506725"
+   ],
+   "claim": "Billing region 469.0 is familiar; home region 469.0",
+   "refs": [
+    "query:card_history(as_of=2016-12-02 18:18:27, card=C10434-K1, lookback_days=180)#call-3"
+   ],
+   "detail": {
+    "addr1": "469.0",
+    "home": "469.0",
+    "novel": false,
+    "concurrent_home": false,
+    "days_in_new_region": 2
+   }
+  },
+  "F5_trip": {
+   "name": "F5_trip",
+   "s": 0.0,
+   "available": true,
+   "entities": [
+    "3506725"
+   ],
+   "claim": "2 distinct days of purchases in region 469.0 without concurrent home-region activity, consistent with a trip",
+   "refs": [
+    "query:card_history(as_of=2016-12-02 18:18:27, card=C10434-K1, lookback_days=180)#call-3"
+   ],
+   "detail": {
+    "addr1": "469.0",
+    "home": "469.0",
+    "novel": false,
+    "concurrent_home": false,
+    "days_in_new_region": 2
+   }
+  },
+  "F8_network": {
+   "name": "F8_network",
+   "s": 1.0,
+   "available": true,
+   "entities": [
+    "C00854-K2",
+    "C01999-K2",
+    "C02231-K1",
+    "C02250-K2",
+    "C02280-K1",
+    "C03066-K1",
+    "C03169-K1",
+    "C03738-K2",
+    "C04024-K2",
+    "C04108-K2",
+    "C05244-K1",
+    "C05508-K1",
+    "C05625-K2",
+    "C06914-K1",
+    "C07185-K2",
+    "C07212-K2",
+    "C08269-K1",
+    "C08489-K2",
+    "C08918-K2",
+    "C09065-K1",
+    "C09241-K2",
+    "C09249-K1",
+    "C10149-K1",
+    "C10308-K1",
+    "C11000-K2",
+    "C11309-K1",
+    "C11381-K2",
+    "C11709-K2",
+    "C12690-K2",
+    "C12897-K1"
+   ],
+   "claim": "Device ring: 30 other customers' cards used the same fully specified device profile in the last 30 days, each with window transactions whose identity record marks the device New",
+   "refs": [
+    "query:shared_origin_scan(as_of=2016-12-02 18:18:27, card=C10434-K1, window_days=30, max_degree=50)#call-4",
+    "query:shared_device_components(as_of=2016-12-02 18:18:27, seed=Windows | Windows 10 | edge 16.0 | 1366x768, window_days=30, max_cards=50, max_hops=1)#call-5"
+   ],
+   "detail": {
+    "links": [],
+    "ring_cards": [
+     "C00854-K2",
+     "C01999-K2",
+     "C02231-K1",
+     "C02250-K2",
+     "C02280-K1",
+     "C03066-K1",
+     "C03169-K1",
+     "C03738-K2",
+     "C04024-K2",
+     "C04108-K2",
+     "C05244-K1",
+     "C05508-K1",
+     "C05625-K2",
+     "C06914-K1",
+     "C07185-K2",
+     "C07212-K2",
+     "C08269-K1",
+     "C08489-K2",
+     "C08918-K2",
+     "C09065-K1",
+     "C09241-K2",
+     "C09249-K1",
+     "C10149-K1",
+     "C10308-K1",
+     "C11000-K2",
+     "C11309-K1",
+     "C11381-K2",
+     "C11709-K2",
+     "C12690-K2",
+     "C12897-K1"
+    ],
+    "capped": [
+     "469.0",
+     "anonymous.com",
+     "gmail.com"
+    ],
+    "partial_profiles_excluded": []
+   }
+  },
+  "F9_prior": {
+   "name": "F9_prior",
+   "s": 0.0,
+   "available": true,
+   "entities": [],
+   "claim": "No earlier confirmed fraud on this card before the alert",
+   "refs": [
+    "query:case_history(as_of=2016-12-02 18:18:27, customer=C10434)#call-6"
+   ],
+   "detail": {}
+  },
+  "F11_memory": {
+   "name": "F11_memory",
+   "s": 1.0,
+   "available": true,
+   "entities": [
+    "CC-2971",
+    "CC-3035",
+    "CC-2649",
+    "CC-2985",
+    "CC-4333"
+   ],
+   "claim": "20 similar closed cases (lexical similarity \u2265 0.35): weighted fraud share 0.98 vs history base rate 0.84; patterns {'undocumented': 4, 'card_not_present_new_device': 14, 'card_not_present_fraud': 2}",
+   "refs": [
+    "query:similar_cases_vector(as_of=2016-12-02 18:18:27, qv=<51 values>, top_k=20)#call-8"
+   ],
+   "detail": {
+    "fraud_share": 0.98,
+    "n": 20,
+    "pattern_votes": {
+     "undocumented": 4,
+     "card_not_present_new_device": 14,
+     "card_not_present_fraud": 2
+    }
+   }
+  }
+ },
+ "familiar": [
+  "product code used before",
+  "home billing region"
+ ],
+ "assessment_initial": {
+  "p": 0.41,
+  "logit": -0.377,
+  "contributions": {
+   "F1_amount": 0.0,
+   "F2_product": 0.0,
+   "F3_burst": 0.0,
+   "F4_device": 0.0,
+   "F6_testing": 0.0,
+   "F7_takeover": 0.0,
+   "F13_recurring": -0.0,
+   "F15_structuring": 0.0,
+   "F5_region": 0.0,
+   "F5_trip": -0.0,
+   "F8_network": 0.289,
+   "F9_prior": 0.0,
+   "F11_memory": 0.0,
+   "F14_familiar": 0.0
+  },
+  "n_support": 0,
+  "n_exculpatory": 0,
+  "conflict": false,
+  "coverage": 1.0,
+  "statement": "none",
+  "history": []
+ },
+ "assessment_final": {
+  "p": 0.51,
+  "logit": 0.0285,
+  "contributions": {
+   "F1_amount": 0.0,
+   "F2_product": 0.0,
+   "F3_burst": 0.0,
+   "F4_device": 0.0,
+   "F6_testing": 0.0,
+   "F7_takeover": 0.0,
+   "F13_recurring": -0.0,
+   "F15_structuring": 0.0,
+   "F5_region": 0.0,
+   "F5_trip": -0.0,
+   "F8_network": 0.289,
+   "F9_prior": 0.0,
+   "F11_memory": 0.0,
+   "F14_familiar": 0.0,
+   "F12_response": 0.4055
+  },
+  "n_support": 1,
+  "n_exculpatory": 0,
+  "conflict": false,
+  "coverage": 1.0,
+  "statement": "no_reply",
+  "history": [
+   0.41
+  ]
+ },
+ "policy_initial": {
+  "trigger_type": "risk_score",
+  "p": 0.41,
+  "n_support": 0,
+  "n_exculpatory": 0,
+  "conflict": false,
+  "verdict": "uncertain",
+  "pattern": "undocumented",
+  "exposure": 1000.03,
+  "response": "none",
+  "card_testing": false,
+  "cleared_over_100": false,
+  "recurring_match": false,
+  "shared_link": true,
+  "shared_element": "DeviceProfile Windows | Windows 10 | edge 16.0 | 1366x768",
+  "shared_cards": 30,
+  "coordinated_cross_customer": true,
+  "confirmed_fraud_cards": 0,
+  "credentials_compromised": false,
+  "customer_visible_cards": 1,
+  "evidence_requested": true,
+  "evidence_request_type": "step_up_auth",
+  "online_device_signal": true
+ },
+ "policy_final": {
+  "trigger_type": "risk_score",
+  "p": 0.51,
+  "n_support": 1,
+  "n_exculpatory": 0,
+  "conflict": false,
+  "verdict": "uncertain",
+  "pattern": "undocumented",
+  "exposure": 1000.03,
+  "response": "no_reply",
+  "card_testing": false,
+  "cleared_over_100": false,
+  "recurring_match": false,
+  "shared_link": true,
+  "shared_element": "DeviceProfile Windows | Windows 10 | edge 16.0 | 1366x768",
+  "shared_cards": 30,
+  "coordinated_cross_customer": true,
+  "confirmed_fraud_cards": 0,
+  "credentials_compromised": false,
+  "customer_visible_cards": 1,
+  "evidence_requested": true,
+  "evidence_request_type": "step_up_auth",
+  "online_device_signal": true
+ },
+ "policy_fired": {
+  "initial": [
+   "R1",
+   "R6",
+   "R8",
+   "R9"
+  ],
+  "final": [
+   "R4",
+   "R6",
+   "R8",
+   "R9"
+  ]
+ },
+ "envelopes": [
+  {
+   "call_id": "call-1",
+   "tool": "get_transaction",
+   "query": "get_transaction",
+   "params": {
+    "as_of": "2016-12-02 18:18:27",
+    "txn": "3506725"
+   },
+   "executed_at": "2026-09-24T20:37:37.240797+00:00",
+   "row_count": 3,
+   "visible_ids": [
+    "3506725",
+    "C10434",
+    "C10434-K1"
+   ],
+   "result_sha256": "c149176755706b2edb43af7f5344b56701347e472a5530d50aa88f804ce93c63",
+   "ref": "query:get_transaction(as_of=2016-12-02 18:18:27, txn=3506725)#call-1"
+  },
+  {
+   "call_id": "call-2",
+   "tool": "customer_cards",
+   "query": "customer_cards",
+   "params": {
+    "as_of": "2016-12-02 18:18:27",
+    "customer": "C10434"
+   },
+   "executed_at": "2026-09-24T20:37:37.660775+00:00",
+   "row_count": 1,
+   "visible_ids": [
+    "C10434-K1"
+   ],
+   "result_sha256": "502178b6f834c652aee66ff5cf326c90acf734aecc40097c44faa7e7b1c2ab83",
+   "ref": "query:customer_cards(as_of=2016-12-02 18:18:27, customer=C10434)#call-2"
+  },
+  {
+   "call_id": "call-3",
+   "tool": "card_history",
+   "query": "card_history",
+   "params": {
+    "as_of": "2016-12-02 18:18:27",
+    "card": "C10434-K1",
+    "lookback_days": 180
+   },
+   "executed_at": "2026-09-24T20:37:38.088797+00:00",
+   "row_count": 34,
+   "visible_ids": [
+    "3016377",
+    "3053503",
+    "3070986",
+    "3075894",
+    "3076736",
+    "3078052",
+    "3082326",
+    "3082968",
+    "3087486",
+    "3091950",
+    "3094730",
+    "3121617",
+    "3139246",
+    "3157522",
+    "3193185",
+    "3197356",
+    "3197666",
+    "3217858",
+    "3237339",
+    "3237387",
+    "3282542",
+    "3282661",
+    "3292160",
+    "3306585",
+    "3329022",
+    "3350771",
+    "3351935",
+    "3392418",
+    "3397310",
+    "3411190",
+    "3419055",
+    "3475344",
+    "3492086",
+    "3506725"
+   ],
+   "result_sha256": "1270701a9ccde4d4293025ede8d965a2e8bc4ee45ed46682b34a80e8598ffe7b",
+   "ref": "query:card_history(as_of=2016-12-02 18:18:27, card=C10434-K1, lookback_days=180)#call-3"
+  },
+  {
+   "call_id": "call-4",
+   "tool": "shared_origin_scan",
+   "query": "shared_origin_scan",
+   "params": {
+    "as_of": "2016-12-02 18:18:27",
+    "card": "C10434-K1",
+    "window_days": 30,
+    "max_degree": 50
+   },
+   "executed_at": "2026-09-24T20:37:38.593753+00:00",
+   "row_count": 56,
+   "visible_ids": [
+    "469.0",
+    "C00854-K2",
+    "C01999-K2",
+    "C02231-K1",
+    "C02250-K2",
+    "C02280-K1",
+    "C02354-K2",
+    "C02375-K1",
+    "C03066-K1",
+    "C03100-K2",
+    "C03169-K1",
+    "C03185-K1",
+    "C03218-K2",
+    "C03343-K1",
+    "C03533-K1",
+    "C03738-K2",
+    "C04024-K2",
+    "C04108-K2",
+    "C04269-K1",
+    "C05244-K1",
+    "C05245-K2",
+    "C05508-K1",
+    "C05625-K2",
+    "C05704-K2",
+    "C06224-K2",
+    "C06270-K1",
+    "C06308-K1",
+    "C06818-K1",
+    "C06914-K1",
+    "C07185-K2",
+    "C07212-K2",
+    "C07780-K1",
+    "C07878-K1",
+    "C07997-K1",
+    "C08269-K1",
+    "C08489-K2",
+    "C08918-K2",
+    "C09065-K1",
+    "C09241-K2",
+    "C09249-K1",
+    "C10149-K1",
+    "C10308-K1",
+    "C10422-K2",
+    "C11000-K2",
+    "C11309-K1",
+    "C11381-K2",
+    "C11539-K2",
+    "C11677-K2",
+    "C11709-K2",
+    "C11951-K1",
+    "C12690-K2",
+    "C12897-K1",
+    "MacOS | Mac OS X 10_13_4 | safari generic | 1440x900",
+    "Windows | Windows 10 | edge 16.0 | 1366x768",
+    "anonymous.com",
+    "gmail.com"
+   ],
+   "result_sha256": "bf7c49c846472c5e50dd22ad0042f5de9feab11859c980b6d6dbbfca369172b7",
+   "ref": "query:shared_origin_scan(as_of=2016-12-02 18:18:27, card=C10434-K1, window_days=30, max_degree=50)#call-4"
+  },
+  {
+   "call_id": "call-5",
+   "tool": "shared_device_components",
+   "query": "shared_device_components",
+   "params": {
+    "as_of": "2016-12-02 18:18:27",
+    "seed": "Windows | Windows 10 | edge 16.0 | 1366x768",
+    "window_days": 30,
+    "max_cards": 50,
+    "max_hops": 1
+   },
+   "executed_at": "2026-09-24T20:37:39.052854+00:00",
+   "row_count": 37,
+   "visible_ids": [
+    "C00854-K2",
+    "C01999-K2",
+    "C02231-K1",
+    "C02250-K2",
+    "C02280-K1",
+    "C03066-K1",
+    "C03169-K1",
+    "C03343-K1",
+    "C03533-K1",
+    "C03738-K2",
+    "C04024-K2",
+    "C04108-K2",
+    "C04269-K1",
+    "C05244-K1",
+    "C05508-K1",
+    "C05625-K2",
+    "C06308-K1",
+    "C06818-K1",
+    "C06914-K1",
+    "C07185-K2",
+    "C07212-K2",
+    "C07780-K1",
+    "C08269-K1",
+    "C08489-K2",
+    "C08918-K2",
+    "C09065-K1",
+    "C09241-K2",
+    "C09249-K1",
+    "C10149-K1",
+    "C10308-K1",
+    "C10434-K1",
+    "C11000-K2",
+    "C11309-K1",
+    "C11381-K2",
+    "C11709-K2",
+    "C12690-K2",
+    "C12897-K1"
+   ],
+   "result_sha256": "153e260d55027e22d6a99b367379349512ebae6d141d95f25cc41475a2591e53",
+   "ref": "query:shared_device_components(as_of=2016-12-02 18:18:27, seed=Windows | Windows 10 | edge 16.0 | 1366x768, window_days=30, max_cards=50, max_hops=1)#call-5"
+  },
+  {
+   "call_id": "call-6",
+   "tool": "case_history",
+   "query": "case_history",
+   "params": {
+    "as_of": "2016-12-02 18:18:27",
+    "customer": "C10434"
+   },
+   "executed_at": "2026-09-24T20:37:39.473834+00:00",
+   "row_count": 1,
+   "visible_ids": [
+    "CC-0873"
+   ],
+   "result_sha256": "1ca992059d425566fac9b46c149623d970d29bcec77d45a9a5451ceece1074f2",
+   "ref": "query:case_history(as_of=2016-12-02 18:18:27, customer=C10434)#call-6"
+  },
+  {
+   "call_id": "call-7",
+   "tool": "related_cases_structural",
+   "query": "related_cases_structural",
+   "params": {
+    "as_of": "2016-12-02 18:18:27",
+    "card": "C10434-K1",
+    "window_days": 30,
+    "max_device_txns": 500,
+    "top_k": 10
+   },
+   "executed_at": "2026-09-24T20:37:39.907038+00:00",
+   "row_count": 12,
+   "visible_ids": [
+    "CC-1034",
+    "CC-2720",
+    "CC-3219",
+    "CC-3549",
+    "CC-3691",
+    "CC-3895",
+    "CC-3949",
+    "CC-3954",
+    "CC-4362",
+    "CC-4890",
+    "MacOS | Mac OS X 10_13_4 | safari generic | 1440x900",
+    "Windows | Windows 10 | edge 16.0 | 1366x768"
+   ],
+   "result_sha256": "493d97390a05148e1eb0c139e21262062f53d1663a1be0508fdb3fbd29053787",
+   "ref": "query:related_cases_structural(as_of=2016-12-02 18:18:27, card=C10434-K1, window_days=30, max_device_txns=500, top_k=10)#call-7"
+  },
+  {
+   "call_id": "call-8",
+   "tool": "similar_cases",
+   "query": "similar_cases_vector",
+   "params": {
+    "as_of": "2016-12-02 18:18:27",
+    "qv": "<51 values>",
+    "top_k": 20
+   },
+   "executed_at": "2026-09-24T20:37:45.067126+00:00",
+   "row_count": 27,
+   "visible_ids": [
+    "CC-0541",
+    "CC-1281",
+    "CC-1414",
+    "CC-1494",
+    "CC-1573",
+    "CC-1789",
+    "CC-1995",
+    "CC-2649",
+    "CC-2971",
+    "CC-2985",
+    "CC-3035",
+    "CC-4044",
+    "CC-4333",
+    "CC-4343",
+    "CC-4523",
+    "CC-4542",
+    "CC-4881",
+    "CC-4958",
+    "CC-5094",
+    "CC-5263",
+    "INV-HHG-002-c5794d8ace",
+    "INV-HHG-006-e8b694b277",
+    "INV-HHG-014-8b1a484af8",
+    "INV-HHG-015-9fe7682578",
+    "INV-HHG-017-0e29f8b20a",
+    "INV-HHG-018-d5f7399f4e",
+    "INV-HHG-019-784319fbda"
+   ],
+   "result_sha256": "e44b23547dbb077f4ef6196f0f88502e6df733887443ecda00eb840d40fb70ef",
+   "ref": "query:similar_cases_vector(as_of=2016-12-02 18:18:27, qv=<51 values>, top_k=20)#call-8"
+  },
+  {
+   "call_id": "call-9",
+   "tool": "knowledge_search",
+   "query": "knowledge_search",
+   "params": {
+    "as_of": "2016-12-02 18:18:27",
+    "qv": "<28 values>",
+    "top_k": 6
+   },
+   "executed_at": "2026-09-24T20:37:45.283426+00:00",
+   "row_count": 6,
+   "visible_ids": [
+    "pattern-card_testing",
+    "pattern-out_of_region_use",
+    "policy-3a",
+    "policy-3b",
+    "policy-R10",
+    "policy-R4"
+   ],
+   "result_sha256": "959b496a2abc97ca0df8be4383993f297ef60a29ed5ed7eaf2def08f596d7b2c",
+   "ref": "query:knowledge_search(as_of=2016-12-02 18:18:27, qv=<28 values>, top_k=6)#call-9"
+  }
+ ],
+ "signature": "Online purchases; inconsistent with the cardholder's usual merchants and amounts; from a device not previously seen on this account; other cardholders reported the same device profile this month.",
+ "linked_cards": [
+  "C00854-K2",
+  "C01999-K2",
+  "C02231-K1",
+  "C02250-K2",
+  "C02280-K1",
+  "C03066-K1",
+  "C03169-K1",
+  "C03738-K2",
+  "C04024-K2",
+  "C04108-K2",
+  "C05244-K1",
+  "C05508-K1",
+  "C05625-K2",
+  "C06914-K1",
+  "C07185-K2",
+  "C07212-K2",
+  "C08269-K1",
+  "C08489-K2",
+  "C08918-K2",
+  "C09065-K1",
+  "C09241-K2",
+  "C09249-K1",
+  "C10149-K1",
+  "C10308-K1",
+  "C11000-K2",
+  "C11309-K1",
+  "C11381-K2",
+  "C11709-K2",
+  "C12690-K2",
+  "C12897-K1"
+ ],
+ "capped_elements": [
+  "469.0",
+  "anonymous.com",
+  "gmail.com"
+ ],
+ "knowledge": [
+  {
+   "chunk_id": "pattern-card_testing",
+   "source": "pattern",
+   "section": "card_testing",
+   "text": "1. Card testing. A stolen card number is checked before use: three or more tiny online authorizations, often under $5, then a larger purchase. Confirmed by the sequence itself. Policy R5.",
+   "url": "data/raw/README.md",
+   "@score": 0.23159334868
+  },
+  {
+   "chunk_id": "pattern-out_of_region_use",
+   "source": "pattern",
+   "section": "out_of_region_use",
+   "text": "4. Out-of-region use. Card-present purchases in a billing region the cardholder has no history in, while their normal activity continues at home. Several days of purchases in one new region is a trip, not a clone. Policy R2, R3.",
+   "url": "data/raw/README.md",
+   "@score": 0.217688080442
+  },
+  {
+   "chunk_id": "policy-3b",
+   "source": "policy",
+   "section": "\u00a73b",
+   "text": "3b. The next best action can change Recommend what the evidence supports now, then request more evidence if the policy calls for it, then recommend again. Example: probability 0.45 on a single signal, so the initial action is `VERIFY_WITH_CUSTOMER` under R1. The customer denies the transaction. Probability rises, and the final actions become `BLOCK_CARD`, `CREATE_CASE`, and possibly `FILE_REPORT` under R2, with connected cards placed under monitoring. Record both the initial and the final recommendation and what changed between them.",
+   "url": "data/raw/README.md",
+   "@score": 0.197590218556
+  },
+  {
+   "chunk_id": "policy-R10",
+   "source": "policy",
+   "section": "R10",
+   "text": "R10. Never `BLOCK_ALL_CARDS` unless at least two of the customer's cards show confirmed fraud or the customer's credentials are confirmed compromised.",
+   "url": "data/raw/README.md",
+   "@score": 0.194340271182
+  },
+  {
+   "chunk_id": "policy-3a",
+   "source": "policy",
+   "section": "\u00a73a",
+   "text": "\"3a. A case is not a report Two different things, and the agent produces both. **A case** (`CREATE_CASE`) is the bank's internal record of an investigation. Open one whenever fraud probability reaches 0.30, whenever you request evidence, or whenever a customer disputes a charge. A case can be closed as fraud or as legitimate. It can be updated when new evidence arrives. It should be written into the graph so later investigations can find it: a case that names a merchant or a device becomes evidence for the next analyst. **A suspicious activity report** (`FILE_REPORT`) is a regulatory filing sent outside the bank. File one when fraud is confirmed or strongly suspected **and** at least one of these holds: exposure exceeds $1,000; the activity connects to a shared device profile, a shared region cluster, or another customer's fraud; the pattern is coordinated or undocumented (rule R9). A report always has a case behind it. Most cases never need a report. The report narrative must stand on its own: who, what, when, where, how, and why it is suspicious. Deciding correctly between \"\"case only\"\" and \"\"case plus report\"\" is part of the next-best-action score.\"",
+   "url": "data/raw/README.md",
+   "@score": 0.190570298852
+  },
+  {
+   "chunk_id": "policy-R4",
+   "source": "policy",
+   "section": "R4",
+   "text": "R4. No reply within 24 hours. Recommend `MONITOR_CARD` and `DECLINE_TRANSACTION` for pending authorizations. Escalate if exposure exceeds $500.",
+   "url": "data/raw/README.md",
+   "@score": 0.188087408472
+  }
+ ],
+ "visible_cards": [
+  "C10434-K1"
+ ]
+}

@@ -1,0 +1,224 @@
+{
+  "case_id": "HHG-018",
+  "case": {
+    "status": "closed_fraud",
+    "verdict": "fraud",
+    "fraud_probability": 0.82,
+    "pattern": "out_of_region_use",
+    "pattern_description": "",
+    "affected_txn_ids": [
+      "3473788",
+      "3475136",
+      "3477263",
+      "3477364",
+      "3478060",
+      "3482454",
+      "3483152",
+      "3483233",
+      "3483447",
+      "3483772",
+      "3484065",
+      "3484403",
+      "3485990",
+      "3486080",
+      "3486949",
+      "3486966",
+      "3487425",
+      "3487493",
+      "3487509",
+      "3487557",
+      "3487985",
+      "3487994",
+      "3488000",
+      "3488015",
+      "3488023",
+      "3488044",
+      "3488061",
+      "3488490",
+      "3488755",
+      "3489497",
+      "3489509",
+      "3489515",
+      "3491361"
+    ],
+    "first_suspicious_txn_id": "3473788",
+    "connected_card_ids": [
+      "C00866-K1",
+      "C01828-K2",
+      "C05062-K2"
+    ],
+    "connected_device_profiles": [
+      "MacOS | Mac OS X 10_12_6 | safari generic | 2880x1800"
+    ],
+    "exposure_usd": 6003.55,
+    "evidence": [
+      {
+        "claim": "Customer message in the alert: Customer C02354 message: 'I never made this $39.08 purchase. Please check my card.' Refers to 3491361.",
+        "source": "customer",
+        "ref": "case_pack:HHG-018.trigger_text",
+        "entity_ids": [
+          "3491361",
+          "C02354"
+        ]
+      },
+      {
+        "claim": "Bank model risk score on transaction 3491361 is 0.48 (an input, not a verdict; weight 0 in the evidence scorer)",
+        "source": "graph",
+        "ref": "query:get_transaction(as_of=2016-11-27 14:41:26, txn=3491361)#call-1",
+        "entity_ids": [
+          "3491361"
+        ]
+      },
+      {
+        "claim": "DeviceProfile 'MacOS | Mac OS X 10_12_6 | safari generic | 2880x1800' is shared in the last 30 days with 2 other card(s) whose confirmed-fraud transactions used it in that window (CC-5538, CC-5550) (contribution +0.29 logit)",
+        "source": "graph",
+        "ref": "query:shared_origin_scan(as_of=2016-11-27 14:41:26, card=C02354-K2, window_days=30, max_degree=50)#call-4",
+        "entity_ids": [
+          "C00866-K1",
+          "C01828-K2",
+          "C05062-K2"
+        ]
+      },
+      {
+        "claim": "19 earlier confirmed-fraud closed case(s) on this card, closed before the alert (contribution +0.82 logit)",
+        "source": "graph",
+        "ref": "query:case_history(as_of=2016-11-27 14:41:26, customer=C02354)#call-5",
+        "entity_ids": [
+          "CC-0255",
+          "CC-0454",
+          "CC-0631",
+          "CC-1450",
+          "CC-1699",
+          "CC-2051",
+          "CC-2187",
+          "CC-2432",
+          "CC-2589",
+          "CC-3085",
+          "CC-3537",
+          "CC-3634",
+          "CC-3899",
+          "CC-4070",
+          "CC-4436",
+          "CC-4721",
+          "CC-4942",
+          "CC-5441",
+          "CC-5558"
+        ]
+      },
+      {
+        "claim": "4 similar closed cases (lexical similarity ≥ 0.35): weighted fraud share 0.98 vs history base rate 0.84; patterns {'undocumented': 4} (contribution +0.00 logit)",
+        "source": "graph",
+        "ref": "query:similar_cases_vector(as_of=2016-11-27 14:41:26, qv=<22 values>, top_k=20)#call-7",
+        "entity_ids": [
+          "CC-2649",
+          "CC-2971",
+          "CC-2985",
+          "CC-3035"
+        ]
+      },
+      {
+        "claim": "Familiar aspects: amount typical for the card; product code used before (contribution +0.00 logit)",
+        "source": "graph",
+        "ref": "query:card_history(as_of=2016-11-27 14:41:26, card=C02354-K2, lookback_days=180)#call-3",
+        "entity_ids": [
+          "3491361"
+        ]
+      },
+      {
+        "claim": "Policy/pattern text retrieved: 4. Out-of-region use. Card-present purchases in a billing region the cardholder has no history in, while their normal activity continues at home. Several days of purchases in one new region is a trip, not a clone. Policy",
+        "source": "document",
+        "ref": "document:README#out_of_region_use",
+        "entity_ids": [
+          "pattern-out_of_region_use"
+        ]
+      },
+      {
+        "claim": "Policy/pattern text retrieved: R6. Shared origin. When several cards show fraud from the same device profile, the same billing region, or the same recipient email in one window, name the shared element, recommend `CREATE_CASE` and `FILE_REPORT`, and `",
+        "source": "document",
+        "ref": "document:README#R6",
+        "entity_ids": [
+          "policy-R6"
+        ]
+      }
+    ],
+    "similar_prior_cases": [
+      "CC-0255",
+      "CC-0454",
+      "CC-0631",
+      "CC-1450",
+      "CC-1699"
+    ],
+    "summary": "Alert on transaction 3491361 ($39.08, in_person) for card C02354-K2 was triggered by a customer report disputing the transaction. Assessed fraud probability is 0.82; the activity is judged fraud (out-of-region use) covering 33 transaction(s) and $6,003.55. Key evidence: DeviceProfile 'MacOS | Mac OS X 10_12_6 | safari generic | 2880x1800' is shared in the last 30 days with 2 other card(s) whose confirmed-fraud transactions used it in that window (CC-5538, CC-5550); 19 earlier confirmed-fraud closed case(s) on this card, closed before the alert; 4 similar closed cases (lexical similarity ≥ 0.35): weighted fraud share 0.98 vs history base rate 0.84; patterns {'undocumented': 4}. Final actions: BLOCK_CARD, CREATE_CASE, FILE_REPORT, MONITOR_CONNECTED_CARDS.",
+    "written_to_graph": true,
+    "graph_case_id": "INV-HHG-018-d5f7399f4e"
+  },
+  "evidence_requests": [],
+  "next_best_actions": {
+    "initial": [
+      {
+        "action": "BLOCK_CARD",
+        "route": "L2",
+        "reason": "R2: customer disputes the transaction in the alert; exposure $6,003.55 > $2,500"
+      },
+      {
+        "action": "CREATE_CASE",
+        "route": "auto",
+        "reason": "R2: customer disputes the transaction in the alert; R6: 4 cards show fraud sharing DeviceProfile MacOS | Mac OS X 10_12_6 | safari generic | 2880x1800 within 30 days; §3a: customer dispute; §3a: a report always has a case behind it"
+      },
+      {
+        "action": "FILE_REPORT",
+        "route": "L2",
+        "reason": "R2: exposure $6,003.55 > $1,000; R6: 4 cards show fraud sharing DeviceProfile MacOS | Mac OS X 10_12_6 | safari generic | 2880x1800 within 30 days; §3a: fraud strongly suspected and exposure $6,003.55 > $1,000"
+      },
+      {
+        "action": "MONITOR_CONNECTED_CARDS",
+        "route": "auto",
+        "reason": "R6: 4 cards show fraud sharing DeviceProfile MacOS | Mac OS X 10_12_6 | safari generic | 2880x1800 within 30 days"
+      }
+    ],
+    "final": [
+      {
+        "action": "BLOCK_CARD",
+        "route": "L2",
+        "reason": "R2: customer disputes the transaction in the alert; exposure $6,003.55 > $2,500"
+      },
+      {
+        "action": "CREATE_CASE",
+        "route": "auto",
+        "reason": "R2: customer disputes the transaction in the alert; R6: 4 cards show fraud sharing DeviceProfile MacOS | Mac OS X 10_12_6 | safari generic | 2880x1800 within 30 days; §3a: customer dispute; §3a: a report always has a case behind it"
+      },
+      {
+        "action": "FILE_REPORT",
+        "route": "L2",
+        "reason": "R2: exposure $6,003.55 > $1,000; R6: 4 cards show fraud sharing DeviceProfile MacOS | Mac OS X 10_12_6 | safari generic | 2880x1800 within 30 days; §3a: fraud strongly suspected and exposure $6,003.55 > $1,000"
+      },
+      {
+        "action": "MONITOR_CONNECTED_CARDS",
+        "route": "auto",
+        "reason": "R6: 4 cards show fraud sharing DeviceProfile MacOS | Mac OS X 10_12_6 | safari generic | 2880x1800 within 30 days"
+      }
+    ],
+    "what_changed": "nothing"
+  },
+  "sar": {
+    "file": true,
+    "reason": "R2: exposure $6,003.55 > $1,000; R6: 4 cards show fraud sharing DeviceProfile MacOS | Mac OS X 10_12_6 | safari generic | 2880x1800 within 30 days; §3a: fraud strongly suspected and exposure $6,003.55 > $1,000",
+    "narrative": "This report concerns customer C02354 and card C02354-K2. Between 2016-11-20 and 2016-11-27, 33 transaction(s) totalling $6,003.55 were identified as part of one suspicious episode (3473788, 3475136, 3477263, 3477364, 3478060, 3482454, 3483152, 3483233). The activity was card present (in person) and the alert was raised by a customer report disputing the transaction on transaction 3491361. The activity is assessed as out-of-region use with a fraud probability of 0.82. DeviceProfile 'MacOS | Mac OS X 10_12_6 | safari generic | 2880x1800' is shared in the last 30 days with 2 other card(s) whose confirmed-fraud transactions used it in that window (CC-5538, CC-5550). 19 earlier confirmed-fraud closed case(s) on this card, closed before the alert. 4 similar closed cases (lexical similarity ≥ 0.35): weighted fraud share 0.98 vs history base rate 0.84; patterns {'undocumented': 4}. The same origin links this card to 3 other card(s): C00866-K1, C01828-K2, C05062-K2. Linked device profile(s): MacOS | Mac OS X 10_12_6 | safari generic | 2880x1800. It is suspicious because DeviceProfile 'MacOS | Mac OS X 10_12_6 | safari generic | 2880x1800' is shared in the last 30 days with 2 other card(s) whose confirmed-fraud transactions used it in that window (CC-5538, CC-5550); 19 earlier confirmed-fraud closed case(s) on this card, closed before the alert. Recommended actions: BLOCK_CARD, CREATE_CASE, FILE_REPORT, MONITOR_CONNECTED_CARDS. All amounts are in USD; product codes and region codes are dataset codes, and no merchant identifiers exist in the data.",
+    "subjects": [
+      "C02354",
+      "C02354-K2",
+      "C00866-K1",
+      "C01828-K2",
+      "C05062-K2"
+    ],
+    "total_amount_usd": 6003.55,
+    "activity_dates": [
+      "2016-11-20",
+      "2016-11-27"
+    ]
+  },
+  "stop_reason": "The customer's own statement in the alert and the graph evidence already determine the policy actions; further steps are unlikely to change the decision (README §6).",
+  "tool_calls": 8,
+  "tokens": 0,
+  "latency_s": 6.71
+}

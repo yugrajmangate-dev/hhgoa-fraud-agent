@@ -1,0 +1,241 @@
+// Phase 1 installed queries. Every query takes as_of DATETIME first (ARCHITECTURE.md §4, §5).
+// Transactions are visible only if ts <= as_of; closed cases only if closed_at <= as_of;
+// agent cases only if case_as_of < as_of and not superseded.
+USE GRAPH FraudGraph
+
+// Q01
+CREATE QUERY get_transaction(DATETIME as_of, VERTEX<Transaction> txn) FOR GRAPH FraudGraph {
+  S = {txn};
+  V = SELECT t FROM S:t WHERE t.ts <= as_of;
+  Cards = SELECT c FROM V:t -(rev_MADE:e)- Card:c;
+  Custs = SELECT u FROM Cards:c -(rev_OWNS:e)- Customer:u;
+  PRINT V AS txn, Cards AS card, Custs AS customer;
+}
+
+// Q04
+CREATE QUERY customer_cards(DATETIME as_of, VERTEX<Customer> customer) FOR GRAPH FraudGraph {
+  SumAccum<INT> @visible_txns;
+  MaxAccum<DATETIME> @last_visible_ts;
+  S = {customer};
+  Cards = SELECT c FROM S:u -(OWNS:e)- Card:c;
+  Vis = SELECT c FROM Cards:c -(MADE:e)- Transaction:t WHERE t.ts <= as_of
+        ACCUM c.@visible_txns += 1, c.@last_visible_ts += t.ts;
+  PRINT Vis AS cards;
+}
+
+// Q27
+CREATE QUERY card_history(DATETIME as_of, VERTEX<Card> card, INT lookback_days) FOR GRAPH FraudGraph {
+  DATETIME lo = datetime_sub(as_of, INTERVAL lookback_days DAY);
+  S = {card};
+  Txns = SELECT t FROM S:c -(MADE:e)- Transaction:t WHERE t.ts <= as_of AND t.ts >= lo;
+  PRINT Txns AS txns;
+}
+
+// Q14: R6 shared origin. A link counts only when a fraud case visible at as_of involves a
+// transaction that itself used the shared element inside the window (fraud FROM the element).
+CREATE QUERY shared_origin_scan(DATETIME as_of, VERTEX<Card> card, INT window_days, INT max_degree) FOR GRAPH FraudGraph {
+  SetAccum<VERTEX> @elems;
+  SetAccum<STRING> @fraud_cases;
+  SumAccum<INT> @window_txns;
+  SetAccum<STRING> @fraud_closed_cases;
+  SetAccum<STRING> @fraud_agent_cases;
+  SumAccum<INT> @new_device_txns;
+  MapAccum<VERTEX, SetAccum<VERTEX>> @@elem_cards;
+  MapAccum<VERTEX, SetAccum<VERTEX>> @@elem_fraud_cards;
+  MapAccum<VERTEX, SetAccum<VERTEX>> @@kept;
+  SetAccum<VERTEX> @@capped;
+  SetAccum<VERTEX> @@kept_cards;
+  DATETIME lo = datetime_sub(as_of, INTERVAL window_days DAY);
+  S = {card};
+  Own = SELECT t FROM S:c -(MADE:e)- Transaction:t WHERE t.ts <= as_of AND t.ts >= lo;
+  Dev = SELECT d FROM Own:t -(FROM_DEVICE:e)- DeviceProfile:d;
+  Reg = SELECT r FROM Own:t -(BILLED_IN:e)- BillingRegion:r;
+  Em = SELECT m FROM Own:t -(RECIPIENT_EMAIL:e)- EmailDomain:m;
+  Elems = Dev UNION Reg UNION Em;
+  OtherT = SELECT t FROM Elems:el -((rev_FROM_DEVICE|rev_BILLED_IN|rev_RECIPIENT_EMAIL):e)- Transaction:t
+           WHERE t.ts <= as_of AND t.ts >= lo
+           ACCUM t.@elems += el, el.@window_txns += 1;
+  FC = SELECT t FROM OtherT:t -(rev_INVOLVES:e)- ClosedCase:k
+       WHERE k.closed_at <= as_of AND k.outcome == "confirmed_fraud"
+       ACCUM t.@fraud_cases += k.case_id;
+  FA = SELECT t FROM OtherT:t -(rev_INVOLVES:e)- InvestigationCase:k
+       WHERE k.case_as_of < as_of AND k.superseded == FALSE AND k.verdict == "fraud"
+       ACCUM t.@fraud_cases += k.case_id;
+  OtherC = SELECT c FROM OtherT:t -(rev_MADE:e)- Card:c WHERE c != card
+           ACCUM FOREACH el IN t.@elems DO @@elem_cards += (el -> c) END,
+                 IF t.@fraud_cases.size() > 0 THEN
+                   FOREACH el IN t.@elems DO @@elem_fraud_cards += (el -> c) END,
+                   c.@fraud_closed_cases += t.@fraud_cases
+                 END;
+  FOREACH (el, cs) IN @@elem_cards DO
+    IF cs.size() <= max_degree THEN
+      @@kept += (el -> cs);
+      FOREACH c IN cs DO @@kept_cards += c; END;
+    ELSE
+      @@capped += el;
+    END;
+  END;
+  KC = {@@kept_cards};
+  N = SELECT t FROM KC:c -(MADE:e)- Transaction:t
+      WHERE t.ts <= as_of AND t.ts >= lo AND t.new_found == "New"
+      ACCUM c.@new_device_txns += 1;
+  PRINT Elems[Elems.@window_txns] AS elements, @@kept AS element_cards, @@elem_fraud_cards AS element_fraud_cards,
+        @@capped AS capped, KC[KC.customer_id, KC.@fraud_closed_cases, KC.@new_device_txns] AS cards;
+}
+
+// Q15: bounded connected-component expansion over the as_of-windowed card-device projection
+CREATE QUERY shared_device_components(DATETIME as_of, VERTEX<DeviceProfile> seed, INT window_days, INT max_cards, INT max_hops) FOR GRAPH FraudGraph {
+  OrAccum @visited;
+  SetAccum<VERTEX> @@cards;
+  SetAccum<VERTEX> @@devices;
+  SetAccum<STRING> @fraud_closed_cases;
+  SetAccum<STRING> @fraud_agent_cases;
+  SumAccum<INT> @new_device_txns;
+  INT hops = 0;
+  DATETIME lo = datetime_sub(as_of, INTERVAL window_days DAY);
+  Frontier = {seed};
+  Frontier = SELECT d FROM Frontier:d POST-ACCUM d.@visited = TRUE, @@devices += d;
+  WHILE Frontier.size() > 0 AND hops < max_hops AND @@cards.size() <= max_cards DO
+    Txns = SELECT t FROM Frontier:d -(rev_FROM_DEVICE:e)- Transaction:t WHERE t.ts <= as_of AND t.ts >= lo;
+    Cards = SELECT c FROM Txns:t -(rev_MADE:e)- Card:c WHERE c.@visited == FALSE
+            POST-ACCUM c.@visited = TRUE, @@cards += c;
+    Txn2 = SELECT t FROM Cards:c -(MADE:e)- Transaction:t WHERE t.ts <= as_of AND t.ts >= lo;
+    Frontier = SELECT d FROM Txn2:t -(FROM_DEVICE:e)- DeviceProfile:d
+               WHERE d.@visited == FALSE AND d.completeness == 4
+               POST-ACCUM d.@visited = TRUE, @@devices += d;
+    hops = hops + 1;
+  END;
+  AllC = {@@cards};
+  F1 = SELECT c FROM AllC:c -((rev_ON_CARD|rev_CONNECTED_TO):e)- ClosedCase:k
+       WHERE k.closed_at <= as_of AND k.outcome == "confirmed_fraud"
+       ACCUM c.@fraud_closed_cases += k.case_id;
+  F2 = SELECT c FROM AllC:c -((rev_ON_CARD|rev_CONNECTED_TO):e)- InvestigationCase:k
+       WHERE k.case_as_of < as_of AND k.superseded == FALSE AND k.verdict == "fraud"
+       ACCUM c.@fraud_agent_cases += k.case_id;
+  N = SELECT t FROM AllC:c -(MADE:e)- Transaction:t
+      WHERE t.ts <= as_of AND t.ts >= lo AND t.new_found == "New"
+      ACCUM c.@new_device_txns += 1;
+  PRINT @@devices AS devices, AllC[AllC.customer_id, AllC.@fraud_closed_cases, AllC.@fraud_agent_cases,
+        AllC.@new_device_txns] AS cards, hops AS hops, @@cards.size() > max_cards AS capped;
+}
+
+// Q17
+CREATE QUERY case_history(DATETIME as_of, VERTEX<Customer> customer) FOR GRAPH FraudGraph {
+  S = {customer};
+  Cards = SELECT c FROM S:u -(OWNS:e)- Card:c;
+  OnCard = SELECT k FROM Cards:c -(rev_ON_CARD:e)- ClosedCase:k WHERE k.closed_at <= as_of;
+  Conn = SELECT k FROM Cards:c -(rev_CONNECTED_TO:e)- ClosedCase:k WHERE k.closed_at <= as_of;
+  Agent = SELECT k FROM Cards:c -((rev_ON_CARD|rev_CONNECTED_TO):e)- InvestigationCase:k
+          WHERE k.case_as_of < as_of AND k.superseded == FALSE;
+  PRINT OnCard[OnCard.case_id, OnCard.card_id, OnCard.opened_at, OnCard.closed_at, OnCard.outcome, OnCard.pattern,
+               OnCard.exposure_usd, OnCard.report_filed] AS closed_on_card,
+        Conn[Conn.case_id, Conn.card_id, Conn.closed_at, Conn.outcome, Conn.pattern] AS closed_connected,
+        Agent[Agent.case_id, Agent.case_as_of, Agent.verdict, Agent.pattern] AS agent_cases;
+}
+
+// Q19
+CREATE QUERY related_cases_structural(DATETIME as_of, VERTEX<Card> card, INT window_days, INT max_device_txns, INT top_k) FOR GRAPH FraudGraph {
+  SumAccum<INT> @deg;
+  SumAccum<INT> @overlap;
+  SetAccum<STRING> @via;
+  DATETIME lo = datetime_sub(as_of, INTERVAL window_days DAY);
+  S = {card};
+  Own = SELECT t FROM S:c -(MADE:e)- Transaction:t WHERE t.ts <= as_of AND t.ts >= lo;
+  Dev = SELECT d FROM Own:t -(FROM_DEVICE:e)- DeviceProfile:d WHERE d.completeness >= 3;
+  DT = SELECT t FROM Dev:d -(rev_FROM_DEVICE:e)- Transaction:t WHERE t.ts <= as_of ACCUM d.@deg += 1;
+  Dv = SELECT d FROM Dev:d WHERE d.@deg <= max_device_txns;
+  T2 = SELECT t FROM Dv:d -(rev_FROM_DEVICE:e)- Transaction:t WHERE t.ts <= as_of ACCUM t.@via += d.profile_key;
+  Cases = SELECT k FROM T2:t -(rev_INVOLVES:e)- ClosedCase:k WHERE k.closed_at <= as_of
+          ACCUM k.@overlap += 1, k.@via += t.@via
+          ORDER BY k.@overlap DESC, k.case_id ASC LIMIT top_k;
+  PRINT Cases[Cases.case_id, Cases.card_id, Cases.closed_at, Cases.outcome, Cases.pattern, Cases.exposure_usd,
+              Cases.analyst_notes, Cases.@overlap, Cases.@via] AS cases,
+        Dev[Dev.@deg] AS devices;
+}
+
+// Q20: brute-force cosine over stored unit vectors; qv entries are "iii" + "wwwwwww" (index, weight x 1e6)
+CREATE QUERY similar_cases_vector(DATETIME as_of, SET<STRING> qv, INT top_k) FOR GRAPH FraudGraph {
+  MapAccum<INT, DOUBLE> @@q;
+  SumAccum<DOUBLE> @score;
+  FOREACH s IN qv DO
+    @@q += (str_to_int(substr(s, 0, 3)) -> str_to_int(substr(s, 3, 7)) / 1000000.0);
+  END;
+  C = {ClosedCase.*};
+  C = SELECT c FROM C:c WHERE c.closed_at <= as_of
+      ACCUM FOREACH (i, w) IN @@q DO c.@score += c.embedding.get(i) * w END
+      ORDER BY c.@score DESC, c.case_id ASC LIMIT top_k;
+  I = {InvestigationCase.*};
+  I = SELECT c FROM I:c WHERE c.case_as_of < as_of AND c.superseded == FALSE AND c.embedding.size() > 0
+      ACCUM FOREACH (i, w) IN @@q DO c.@score += c.embedding.get(i) * w END
+      ORDER BY c.@score DESC LIMIT top_k;
+  PRINT C[C.case_id, C.card_id, C.closed_at, C.outcome, C.pattern, C.exposure_usd, C.report_filed,
+          C.analyst_notes, C.@score] AS closed,
+        I[I.case_id, I.case_as_of, I.verdict, I.pattern, I.summary, I.@score] AS agent;
+}
+
+// Q21: documents are reference material outside the case timeline; as_of is kept for uniform audit
+CREATE QUERY knowledge_search(DATETIME as_of, SET<STRING> qv, INT top_k) FOR GRAPH FraudGraph {
+  MapAccum<INT, DOUBLE> @@q;
+  SumAccum<DOUBLE> @score;
+  FOREACH s IN qv DO
+    @@q += (str_to_int(substr(s, 0, 3)) -> str_to_int(substr(s, 3, 7)) / 1000000.0);
+  END;
+  K = {KnowledgeChunk.*};
+  K = SELECT k FROM K:k
+      ACCUM FOREACH (i, w) IN @@q DO k.@score += k.embedding.get(i) * w END
+      ORDER BY k.@score DESC, k.chunk_id ASC LIMIT top_k;
+  PRINT K[K.chunk_id, K.source, K.section, K.text, K.url, K.@score] AS chunks;
+}
+
+// Q24
+CREATE QUERY verify_investigation_case(DATETIME as_of, VERTEX<InvestigationCase> c) FOR GRAPH FraudGraph {
+  MapAccum<STRING, SumAccum<INT>> @@edges;
+  S = {c};
+  E = SELECT t FROM S:s -(:e)- :t ACCUM @@edges += (e.type -> 1);
+  PRINT S[S.case_id, S.case_as_of, S.status, S.verdict, S.answer_sha256, S.superseded, S.simulated] AS case_vertex,
+        @@edges AS edge_counts;
+}
+
+// Q28
+CREATE QUERY delete_case_edges(DATETIME as_of, VERTEX<InvestigationCase> c) FOR GRAPH FraudGraph {
+  SumAccum<INT> @@deleted;
+  S = {c};
+  Owned = SELECT t FROM S:s -((HAS_EVIDENCE|HAS_ACTION):e)- :t;
+  X = SELECT t FROM Owned:t POST-ACCUM DELETE(t), @@deleted += 1;
+  Y = SELECT t FROM S:s -((FLAGGED|INVOLVES|ON_CARD|CONNECTED_TO|FIRST_FRAUD|HAS_PATTERN|NAMES_DEVICE|SIMILAR_TO|SUPERSEDES):e)- :t
+      ACCUM DELETE(e), @@deleted += 1;
+  PRINT @@deleted AS deleted;
+}
+
+// Q25
+CREATE QUERY load_verification_counts(DATETIME as_of) FOR GRAPH FraudGraph {
+  MapAccum<STRING, SumAccum<INT>> @@n;
+  Cu = {Customer.*};
+  Ca = {Card.*};
+  Dp = {DeviceProfile.*};
+  Em = {EmailDomain.*};
+  Br = {BillingRegion.*};
+  @@n += ("Customer" -> Cu.size());
+  @@n += ("Card" -> Ca.size());
+  @@n += ("DeviceProfile" -> Dp.size());
+  @@n += ("EmailDomain" -> Em.size());
+  @@n += ("BillingRegion" -> Br.size());
+  T = {Transaction.*};
+  T = SELECT t FROM T:t WHERE t.ts <= as_of ACCUM @@n += ("Transaction" -> 1);
+  X = SELECT t FROM T:t -(rev_MADE:e)- Card:c ACCUM @@n += ("MADE" -> 1);
+  X = SELECT t FROM T:t -(FROM_DEVICE:e)- DeviceProfile:d ACCUM @@n += ("FROM_DEVICE" -> 1);
+  X = SELECT t FROM T:t -(PURCHASER_EMAIL:e)- EmailDomain:d ACCUM @@n += ("PURCHASER_EMAIL" -> 1);
+  X = SELECT t FROM T:t -(RECIPIENT_EMAIL:e)- EmailDomain:d ACCUM @@n += ("RECIPIENT_EMAIL" -> 1);
+  X = SELECT t FROM T:t -(BILLED_IN:e)- BillingRegion:d ACCUM @@n += ("BILLED_IN" -> 1);
+  X = SELECT t FROM T:t -(NEXT:e)- Transaction:u WHERE u.ts <= as_of ACCUM @@n += ("NEXT" -> 1);
+  K = {ClosedCase.*};
+  K = SELECT k FROM K:k WHERE k.closed_at <= as_of ACCUM @@n += ("ClosedCase" -> 1);
+  X = SELECT k FROM K:k -(INVOLVES:e)- Transaction:t ACCUM @@n += ("INVOLVES" -> 1);
+  X = SELECT k FROM K:k -(ON_CARD:e)- Card:c ACCUM @@n += ("ON_CARD" -> 1);
+  X = SELECT k FROM K:k -(CONNECTED_TO:e)- Card:c ACCUM @@n += ("CONNECTED_TO" -> 1);
+  X = SELECT k FROM K:k -(FIRST_FRAUD:e)- Transaction:t ACCUM @@n += ("FIRST_FRAUD" -> 1);
+  X = SELECT k FROM K:k -(HAS_PATTERN:e)- FraudPattern:p ACCUM @@n += ("HAS_PATTERN" -> 1);
+  KC = {KnowledgeChunk.*};
+  @@n += ("KnowledgeChunk" -> KC.size());
+  PRINT @@n AS counts;
+}

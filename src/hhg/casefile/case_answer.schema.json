@@ -1,0 +1,475 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:hhgoa-fraud-agent:case-answer:v1",
+  "title": "HHGoa 2026 answer file (cases/<case_id>.json)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "case_id",
+    "case",
+    "evidence_requests",
+    "next_best_actions",
+    "sar",
+    "stop_reason",
+    "tool_calls",
+    "tokens",
+    "latency_s"
+  ],
+  "properties": {
+    "case_id": {
+      "type": "string",
+      "pattern": "^HHG-(00[1-9]|01[0-9]|020)$"
+    },
+    "case": {
+      "$ref": "#/$defs/case"
+    },
+    "evidence_requests": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/evidence_request"
+      }
+    },
+    "next_best_actions": {
+      "$ref": "#/$defs/next_best_actions"
+    },
+    "sar": {
+      "$ref": "#/$defs/sar"
+    },
+    "stop_reason": {
+      "type": "string",
+      "minLength": 1
+    },
+    "tool_calls": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "tokens": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "latency_s": {
+      "type": "number",
+      "minimum": 0
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "case": {
+            "properties": {
+              "verdict": {
+                "const": "legitimate"
+              }
+            }
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "sar": {
+            "properties": {
+              "file": {
+                "const": false
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "txn_id": {
+      "type": "string",
+      "pattern": "^[0-9]{7}$"
+    },
+    "card_id": {
+      "type": "string",
+      "pattern": "^C[0-9]{5}-K[0-9]+$"
+    },
+    "closed_case_id": {
+      "type": "string",
+      "pattern": "^CC-[0-9]{4}$"
+    },
+    "date": {
+      "type": "string",
+      "pattern": "^2016-(0[7-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$"
+    },
+    "action": {
+      "enum": [
+        "ALLOW_TRANSACTION",
+        "DECLINE_TRANSACTION",
+        "MONITOR_CARD",
+        "MONITOR_CONNECTED_CARDS",
+        "WARN_CUSTOMER",
+        "VERIFY_WITH_CUSTOMER",
+        "STEP_UP_AUTH",
+        "BLOCK_CARD",
+        "BLOCK_ALL_CARDS",
+        "GENERATE_REPORT",
+        "CREATE_CASE",
+        "FILE_REPORT",
+        "ESCALATE_TO_ANALYST",
+        "CLOSE_NO_FRAUD"
+      ]
+    },
+    "route": {
+      "enum": [
+        "auto",
+        "L1",
+        "L2"
+      ]
+    },
+    "pattern": {
+      "enum": [
+        "card_testing",
+        "card_not_present_fraud",
+        "card_not_present_new_device",
+        "out_of_region_use",
+        "account_takeover",
+        "undocumented",
+        "none"
+      ]
+    },
+    "action_item": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "action",
+        "route",
+        "reason"
+      ],
+      "properties": {
+        "action": {
+          "$ref": "#/$defs/action"
+        },
+        "route": {
+          "$ref": "#/$defs/route"
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "evidence_item": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "claim",
+        "source",
+        "ref",
+        "entity_ids"
+      ],
+      "properties": {
+        "claim": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source": {
+          "enum": [
+            "graph",
+            "document",
+            "customer",
+            "external"
+          ]
+        },
+        "ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "entity_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "evidence_request": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "asked_after_step",
+        "assumed_response"
+      ],
+      "properties": {
+        "type": {
+          "enum": [
+            "customer_validation",
+            "step_up_auth",
+            "analyst_info"
+          ]
+        },
+        "asked_after_step": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "assumed_response": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "case": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "verdict",
+        "fraud_probability",
+        "pattern",
+        "pattern_description",
+        "affected_txn_ids",
+        "first_suspicious_txn_id",
+        "connected_card_ids",
+        "connected_device_profiles",
+        "exposure_usd",
+        "evidence",
+        "similar_prior_cases",
+        "summary",
+        "written_to_graph",
+        "graph_case_id"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "open",
+            "closed_fraud",
+            "closed_legitimate",
+            "escalated"
+          ]
+        },
+        "verdict": {
+          "enum": [
+            "fraud",
+            "legitimate",
+            "uncertain"
+          ]
+        },
+        "fraud_probability": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "pattern": {
+          "$ref": "#/$defs/pattern"
+        },
+        "pattern_description": {
+          "type": "string"
+        },
+        "affected_txn_ids": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/txn_id"
+          }
+        },
+        "first_suspicious_txn_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/txn_id"
+            },
+            {
+              "const": ""
+            }
+          ]
+        },
+        "connected_card_ids": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/card_id"
+          }
+        },
+        "connected_device_profiles": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "exposure_usd": {
+          "type": "number",
+          "minimum": 0
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/evidence_item"
+          }
+        },
+        "similar_prior_cases": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/closed_case_id"
+          }
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        },
+        "written_to_graph": {
+          "type": "boolean"
+        },
+        "graph_case_id": {
+          "type": "string"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "pattern": {
+                "const": "undocumented"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "pattern_description": {
+                "minLength": 1
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "pattern_description": {
+                "const": ""
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "verdict": {
+                "const": "legitimate"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "affected_txn_ids": {
+                "maxItems": 0
+              },
+              "exposure_usd": {
+                "const": 0
+              }
+            }
+          }
+        }
+      ]
+    },
+    "sar": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "file",
+        "reason",
+        "narrative",
+        "subjects",
+        "total_amount_usd",
+        "activity_dates"
+      ],
+      "properties": {
+        "file": {
+          "type": "boolean"
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        },
+        "narrative": {
+          "type": "string"
+        },
+        "subjects": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "total_amount_usd": {
+          "type": "number",
+          "minimum": 0
+        },
+        "activity_dates": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/date"
+          }
+        }
+      },
+      "if": {
+        "properties": {
+          "file": {
+            "const": false
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "narrative": {
+            "const": ""
+          },
+          "subjects": {
+            "maxItems": 0
+          },
+          "total_amount_usd": {
+            "const": 0
+          },
+          "activity_dates": {
+            "maxItems": 0
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "narrative": {
+            "minLength": 1
+          },
+          "subjects": {
+            "minItems": 1
+          },
+          "activity_dates": {
+            "minItems": 2,
+            "maxItems": 2
+          }
+        }
+      }
+    },
+    "next_best_actions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "initial",
+        "final",
+        "what_changed"
+      ],
+      "properties": {
+        "initial": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/action_item"
+          }
+        },
+        "final": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/action_item"
+          }
+        },
+        "what_changed": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}

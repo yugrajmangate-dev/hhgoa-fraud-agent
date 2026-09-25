@@ -1,0 +1,141 @@
+{
+  "case_id": "HHG-008",
+  "case": {
+    "status": "closed_fraud",
+    "verdict": "fraud",
+    "fraud_probability": 0.78,
+    "pattern": "card_not_present_fraud",
+    "pattern_description": "",
+    "affected_txn_ids": [
+      "3558054"
+    ],
+    "first_suspicious_txn_id": "3558054",
+    "connected_card_ids": [],
+    "connected_device_profiles": [],
+    "exposure_usd": 55.68,
+    "evidence": [
+      {
+        "claim": "Customer message in the alert: Customer C13171 message: 'I never made this $55.68 purchase. Please check my card.' Refers to 3558054.",
+        "source": "customer",
+        "ref": "case_pack:HHG-008.trigger_text",
+        "entity_ids": [
+          "3558054",
+          "C13171"
+        ]
+      },
+      {
+        "claim": "Bank model risk score on transaction 3558054 is 0.38 (an input, not a verdict; weight 0 in the evidence scorer)",
+        "source": "graph",
+        "ref": "query:get_transaction(as_of=2016-12-20 03:08:56, txn=3558054)#call-1",
+        "entity_ids": [
+          "3558054"
+        ]
+      },
+      {
+        "claim": "No shared device, region or recipient email links to other cards' visible fraud in 30 days (contribution +0.00 logit)",
+        "source": "graph",
+        "ref": "query:shared_origin_scan(as_of=2016-12-20 03:08:56, card=C13171-K2, window_days=30, max_degree=50)#call-4",
+        "entity_ids": []
+      },
+      {
+        "claim": "18 earlier confirmed-fraud closed case(s) on this card, closed before the alert (contribution +0.82 logit)",
+        "source": "graph",
+        "ref": "query:case_history(as_of=2016-12-20 03:08:56, customer=C13171)#call-5",
+        "entity_ids": [
+          "CC-0056",
+          "CC-0467",
+          "CC-0772",
+          "CC-1293",
+          "CC-1715",
+          "CC-1925",
+          "CC-2059",
+          "CC-2244",
+          "CC-2454",
+          "CC-2716",
+          "CC-3079",
+          "CC-3422",
+          "CC-3566",
+          "CC-3728",
+          "CC-3928",
+          "CC-4163",
+          "CC-4485",
+          "CC-5010"
+        ]
+      },
+      {
+        "claim": "Familiar aspects: amount typical for the card; product code used before; device profile seen before on the card and marked Found (contribution +0.00 logit)",
+        "source": "graph",
+        "ref": "query:card_history(as_of=2016-12-20 03:08:56, card=C13171-K2, lookback_days=180)#call-3",
+        "entity_ids": [
+          "3558054"
+        ]
+      },
+      {
+        "claim": "Policy/pattern text retrieved: 2. Card-not-present fraud. The number is used online without the card. Amounts and products that don't fit the cardholder's history, often in a burst of two to four within 48 hours. On its own, one unusual online purchas",
+        "source": "document",
+        "ref": "document:README#card_not_present_fraud",
+        "entity_ids": [
+          "pattern-card_not_present_fraud"
+        ]
+      },
+      {
+        "claim": "Policy/pattern text retrieved: \"3a. A case is not a report Two different things, and the agent produces both. **A case** (`CREATE_CASE`) is the bank's internal record of an investigation. Open one whenever fraud probability reaches 0.30, whenever you ",
+        "source": "document",
+        "ref": "document:README#§3a",
+        "entity_ids": [
+          "policy-3a"
+        ]
+      }
+    ],
+    "similar_prior_cases": [
+      "CC-0056",
+      "CC-0467",
+      "CC-0772",
+      "CC-1293",
+      "CC-1715"
+    ],
+    "summary": "Alert on transaction 3558054 ($55.68, online) for card C13171-K2 was triggered by a customer report disputing the transaction. Assessed fraud probability is 0.78; the activity is judged fraud (card-not-present fraud) covering 1 transaction(s) and $55.68. Key evidence: No shared device, region or recipient email links to other cards' visible fraud in 30 days; 18 earlier confirmed-fraud closed case(s) on this card, closed before the alert; Familiar aspects: amount typical for the card; product code used before; device profile seen before on the card and marked Found. Final actions: BLOCK_CARD, CREATE_CASE.",
+    "written_to_graph": true,
+    "graph_case_id": "INV-HHG-008-e9a2cb825d"
+  },
+  "evidence_requests": [],
+  "next_best_actions": {
+    "initial": [
+      {
+        "action": "BLOCK_CARD",
+        "route": "L1",
+        "reason": "R2: customer disputes the transaction in the alert; exposure $55.68 ≤ $2,500"
+      },
+      {
+        "action": "CREATE_CASE",
+        "route": "auto",
+        "reason": "R2: customer disputes the transaction in the alert; §3a: customer dispute"
+      }
+    ],
+    "final": [
+      {
+        "action": "BLOCK_CARD",
+        "route": "L1",
+        "reason": "R2: customer disputes the transaction in the alert; exposure $55.68 ≤ $2,500"
+      },
+      {
+        "action": "CREATE_CASE",
+        "route": "auto",
+        "reason": "R2: customer disputes the transaction in the alert; §3a: customer dispute"
+      }
+    ],
+    "what_changed": "nothing"
+  },
+  "sar": {
+    "file": false,
+    "reason": "§3a: no report; fraud is not confirmed or strongly suspected together with exposure over $1,000, a shared origin, or an undocumented coordinated pattern",
+    "narrative": "",
+    "subjects": [],
+    "total_amount_usd": 0,
+    "activity_dates": []
+  },
+  "stop_reason": "The customer's own statement in the alert and the graph evidence already determine the policy actions; further steps are unlikely to change the decision (README §6).",
+  "tool_calls": 8,
+  "tokens": 0,
+  "latency_s": 5.93
+}

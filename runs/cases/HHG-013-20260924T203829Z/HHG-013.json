@@ -1,0 +1,154 @@
+{
+  "case_id": "HHG-013",
+  "case": {
+    "status": "open",
+    "verdict": "uncertain",
+    "fraud_probability": 0.64,
+    "pattern": "card_not_present_new_device",
+    "pattern_description": "",
+    "affected_txn_ids": [
+      "3526826"
+    ],
+    "first_suspicious_txn_id": "3526826",
+    "connected_card_ids": [],
+    "connected_device_profiles": [],
+    "exposure_usd": 35.66,
+    "evidence": [
+      {
+        "claim": "Bank model risk score on transaction 3526826 is 0.76 (an input, not a verdict; weight 0 in the evidence scorer)",
+        "source": "graph",
+        "ref": "query:get_transaction(as_of=2016-12-09 05:39:29, txn=3526826)#call-1",
+        "entity_ids": [
+          "3526826"
+        ]
+      },
+      {
+        "claim": "No shared device, region or recipient email links to other cards' visible fraud in 30 days (contribution +0.00 logit)",
+        "source": "graph",
+        "ref": "query:shared_origin_scan(as_of=2016-12-09 05:39:29, card=C07671-K2, window_days=30, max_degree=50)#call-4",
+        "entity_ids": []
+      },
+      {
+        "claim": "3 earlier confirmed-fraud closed case(s) on this card, closed before the alert (contribution +0.82 logit)",
+        "source": "graph",
+        "ref": "query:case_history(as_of=2016-12-09 05:39:29, customer=C07671)#call-5",
+        "entity_ids": [
+          "CC-1475",
+          "CC-3216",
+          "CC-4294"
+        ]
+      },
+      {
+        "claim": "20 similar closed cases (lexical similarity ≥ 0.35): weighted fraud share 0.98 vs history base rate 0.84; patterns {'card_not_present_new_device': 20} (contribution +0.00 logit)",
+        "source": "graph",
+        "ref": "query:similar_cases_vector(as_of=2016-12-09 05:39:29, qv=<21 values>, top_k=20)#call-7",
+        "entity_ids": [
+          "CC-1880",
+          "CC-4343",
+          "CC-4350",
+          "CC-4628",
+          "CC-5037"
+        ]
+      },
+      {
+        "claim": "Familiar aspects: amount typical for the card; product code used before (contribution +0.00 logit)",
+        "source": "graph",
+        "ref": "query:card_history(as_of=2016-12-09 05:39:29, card=C07671-K2, lookback_days=180)#call-3",
+        "entity_ids": [
+          "3526826"
+        ]
+      },
+      {
+        "claim": "Simulated: no reply within 24 hours (pre-response probability 0.54 is between the 0.40 confirm and 0.60 deny thresholds)",
+        "source": "customer",
+        "ref": "evidence_request:1",
+        "entity_ids": [
+          "3526826"
+        ]
+      },
+      {
+        "claim": "Policy/pattern text retrieved: 3. Card-not-present fraud from a new device. Same as above, with the identity record marking the device as `New` for this account, sometimes behind a proxy. Stronger than pattern 2, still not proof: people buy new phones",
+        "source": "document",
+        "ref": "document:README#card_not_present_new_device",
+        "entity_ids": [
+          "pattern-card_not_present_new_device"
+        ]
+      },
+      {
+        "claim": "Policy/pattern text retrieved: R4. No reply within 24 hours. Recommend `MONITOR_CARD` and `DECLINE_TRANSACTION` for pending authorizations. Escalate if exposure exceeds $500.",
+        "source": "document",
+        "ref": "document:README#R4",
+        "entity_ids": [
+          "policy-R4"
+        ]
+      },
+      {
+        "claim": "Policy/pattern text retrieved: \"3a. A case is not a report Two different things, and the agent produces both. **A case** (`CREATE_CASE`) is the bank's internal record of an investigation. Open one whenever fraud probability reaches 0.30, whenever you ",
+        "source": "document",
+        "ref": "document:README#§3a",
+        "entity_ids": [
+          "policy-3a"
+        ]
+      }
+    ],
+    "similar_prior_cases": [
+      "CC-1475",
+      "CC-3216",
+      "CC-4294"
+    ],
+    "summary": "Alert on transaction 3526826 ($35.66, online) for card C07671-K2 was triggered by a bank model risk score of 0.76. Assessed fraud probability is 0.64; the evidence does not settle the question (leading hypothesis: card-not-present fraud from a new device). Key evidence: No shared device, region or recipient email links to other cards' visible fraud in 30 days; 3 earlier confirmed-fraud closed case(s) on this card, closed before the alert; 20 similar closed cases (lexical similarity ≥ 0.35): weighted fraud share 0.98 vs history base rate 0.84; patterns {'card_not_present_new_device': 20}. A step up auth request was made and its response was simulated as 'no_reply'. Final actions: DECLINE_TRANSACTION, CREATE_CASE, MONITOR_CARD.",
+    "written_to_graph": true,
+    "graph_case_id": "INV-HHG-013-fd60122ba0"
+  },
+  "evidence_requests": [
+    {
+      "type": "step_up_auth",
+      "asked_after_step": 10,
+      "assumed_response": "Simulated: no reply within 24 hours (pre-response probability 0.54 is between the 0.40 confirm and 0.60 deny thresholds)"
+    }
+  ],
+  "next_best_actions": {
+    "initial": [
+      {
+        "action": "STEP_UP_AUTH",
+        "route": "auto",
+        "reason": "R1: case rests on at most one signal and probability 0.54 < 0.70; verify before any block; §3b: evidence requested before the final recommendation"
+      },
+      {
+        "action": "CREATE_CASE",
+        "route": "auto",
+        "reason": "§3a: evidence requested"
+      }
+    ],
+    "final": [
+      {
+        "action": "DECLINE_TRANSACTION",
+        "route": "L1",
+        "reason": "R4: no reply within 24 hours; decline pending authorizations"
+      },
+      {
+        "action": "CREATE_CASE",
+        "route": "auto",
+        "reason": "§3a: evidence requested"
+      },
+      {
+        "action": "MONITOR_CARD",
+        "route": "auto",
+        "reason": "R4: no reply within 24 hours (simulated)"
+      }
+    ],
+    "what_changed": "The simulated no reply response moved the fraud probability from 0.54 to 0.64 and the verdict to uncertain. Final actions add DECLINE_TRANSACTION, MONITOR_CARD and drop STEP_UP_AUTH."
+  },
+  "sar": {
+    "file": false,
+    "reason": "§3a: no report; fraud is not confirmed or strongly suspected together with exposure over $1,000, a shared origin, or an undocumented coordinated pattern",
+    "narrative": "",
+    "subjects": [],
+    "total_amount_usd": 0,
+    "activity_dates": []
+  },
+  "stop_reason": "No reply within 24 hours was assumed; policy R4 actions apply and the remaining uncertainty is handed on as recorded. Further automated steps are unlikely to change the decision.",
+  "tool_calls": 8,
+  "tokens": 0,
+  "latency_s": 4.88
+}

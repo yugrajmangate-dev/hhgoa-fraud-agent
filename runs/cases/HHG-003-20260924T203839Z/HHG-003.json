@@ -1,0 +1,155 @@
+{
+  "case_id": "HHG-003",
+  "case": {
+    "status": "closed_fraud",
+    "verdict": "fraud",
+    "fraud_probability": 0.85,
+    "pattern": "out_of_region_use",
+    "pattern_description": "",
+    "affected_txn_ids": [
+      "3511680",
+      "3521522",
+      "3521524",
+      "3521954",
+      "3522026",
+      "3527215",
+      "3530056",
+      "3530164"
+    ],
+    "first_suspicious_txn_id": "3511680",
+    "connected_card_ids": [],
+    "connected_device_profiles": [],
+    "exposure_usd": 508.94,
+    "evidence": [
+      {
+        "claim": "Customer message in the alert: Customer C08623 message: 'I never made this $49.00 purchase. Please check my card.' Refers to 3530164.",
+        "source": "customer",
+        "ref": "case_pack:HHG-003.trigger_text",
+        "entity_ids": [
+          "3530164",
+          "C08623"
+        ]
+      },
+      {
+        "claim": "Bank model risk score on transaction 3530164 is 0.40 (an input, not a verdict; weight 0 in the evidence scorer)",
+        "source": "graph",
+        "ref": "query:get_transaction(as_of=2016-12-10 15:01:21, txn=3530164)#call-1",
+        "entity_ids": [
+          "3530164"
+        ]
+      },
+      {
+        "claim": "Credential anomalies: match flags M5 false where history is mostly true; purchaser email domain me.com new to the card (contribution +0.50 logit)",
+        "source": "graph",
+        "ref": "query:card_history(as_of=2016-12-10 15:01:21, card=C08623-K2, lookback_days=180)#call-3",
+        "entity_ids": [
+          "3530164"
+        ]
+      },
+      {
+        "claim": "No shared device, region or recipient email links to other cards' visible fraud in 30 days (contribution +0.00 logit)",
+        "source": "graph",
+        "ref": "query:shared_origin_scan(as_of=2016-12-10 15:01:21, card=C08623-K2, window_days=30, max_degree=50)#call-4",
+        "entity_ids": []
+      },
+      {
+        "claim": "5 earlier confirmed-fraud closed case(s) on this card, closed before the alert (contribution +0.82 logit)",
+        "source": "graph",
+        "ref": "query:case_history(as_of=2016-12-10 15:01:21, customer=C08623)#call-5",
+        "entity_ids": [
+          "CC-2817",
+          "CC-2935",
+          "CC-3327",
+          "CC-3682",
+          "CC-4957"
+        ]
+      },
+      {
+        "claim": "20 similar closed cases (lexical similarity ≥ 0.35): weighted fraud share 0.98 vs history base rate 0.84; patterns {'account_takeover': 20} (contribution +0.00 logit)",
+        "source": "graph",
+        "ref": "query:similar_cases_vector(as_of=2016-12-10 15:01:21, qv=<30 values>, top_k=20)#call-7",
+        "entity_ids": [
+          "CC-0319",
+          "CC-3326",
+          "CC-4883",
+          "CC-4889",
+          "CC-4892"
+        ]
+      },
+      {
+        "claim": "Familiar aspects: amount typical for the card; product code used before (contribution +0.00 logit)",
+        "source": "graph",
+        "ref": "query:card_history(as_of=2016-12-10 15:01:21, card=C08623-K2, lookback_days=180)#call-3",
+        "entity_ids": [
+          "3530164"
+        ]
+      },
+      {
+        "claim": "Policy/pattern text retrieved: 4. Out-of-region use. Card-present purchases in a billing region the cardholder has no history in, while their normal activity continues at home. Several days of purchases in one new region is a trip, not a clone. Policy",
+        "source": "document",
+        "ref": "document:README#out_of_region_use",
+        "entity_ids": [
+          "pattern-out_of_region_use"
+        ]
+      },
+      {
+        "claim": "Policy/pattern text retrieved: R1. Verify before you block on a weak signal. If the case rests on a single signal (including a risk score alone) and your assessed fraud probability is below 0.70, recommend `VERIFY_WITH_CUSTOMER` or `STEP_UP_AUTH` befo",
+        "source": "document",
+        "ref": "document:README#R1",
+        "entity_ids": [
+          "policy-R1"
+        ]
+      }
+    ],
+    "similar_prior_cases": [
+      "CC-2817",
+      "CC-2935",
+      "CC-3327",
+      "CC-3682",
+      "CC-4957"
+    ],
+    "summary": "Alert on transaction 3530164 ($49.00, in_person) for card C08623-K2 was triggered by a customer report disputing the transaction. Assessed fraud probability is 0.85; the activity is judged fraud (out-of-region use) covering 8 transaction(s) and $508.94. Key evidence: Credential anomalies: match flags M5 false where history is mostly true; purchaser email domain me.com new to the card; No shared device, region or recipient email links to other cards' visible fraud in 30 days; 5 earlier confirmed-fraud closed case(s) on this card, closed before the alert. Final actions: BLOCK_CARD, CREATE_CASE.",
+    "written_to_graph": true,
+    "graph_case_id": "INV-HHG-003-35fc67b346"
+  },
+  "evidence_requests": [],
+  "next_best_actions": {
+    "initial": [
+      {
+        "action": "BLOCK_CARD",
+        "route": "L1",
+        "reason": "R2: customer disputes the transaction in the alert; exposure $508.94 ≤ $2,500; §6: probability 0.85 ≥ 0.85 with 3 independent signals; R1 does not apply; exposure $508.94"
+      },
+      {
+        "action": "CREATE_CASE",
+        "route": "auto",
+        "reason": "R2: customer disputes the transaction in the alert; §6/§3a: probability 0.85 ≥ 0.30; §3a: customer dispute"
+      }
+    ],
+    "final": [
+      {
+        "action": "BLOCK_CARD",
+        "route": "L1",
+        "reason": "R2: customer disputes the transaction in the alert; exposure $508.94 ≤ $2,500; §6: probability 0.85 ≥ 0.85 with 3 independent signals; R1 does not apply; exposure $508.94"
+      },
+      {
+        "action": "CREATE_CASE",
+        "route": "auto",
+        "reason": "R2: customer disputes the transaction in the alert; §6/§3a: probability 0.85 ≥ 0.30; §3a: customer dispute"
+      }
+    ],
+    "what_changed": "nothing"
+  },
+  "sar": {
+    "file": false,
+    "reason": "§3a: no report; fraud is not confirmed or strongly suspected together with exposure over $1,000, a shared origin, or an undocumented coordinated pattern",
+    "narrative": "",
+    "subjects": [],
+    "total_amount_usd": 0,
+    "activity_dates": []
+  },
+  "stop_reason": "Stopping rule met: probability 0.85 with 3 independent pieces of evidence (README §6); further steps would not change the decision.",
+  "tool_calls": 8,
+  "tokens": 0,
+  "latency_s": 4.36
+}

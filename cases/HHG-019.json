@@ -1,0 +1,187 @@
+{
+  "case_id": "HHG-019",
+  "case": {
+    "status": "escalated",
+    "verdict": "fraud",
+    "fraud_probability": 0.93,
+    "pattern": "undocumented",
+    "pattern_description": "One device profile (Windows | other | chrome 61.0 | 1280x720), new to each account and seen behind a proxy, is used for online purchases on at least 3 different customers' cards within 30 days. The activity looks like a shared-device ring rather than a single compromised card, and earlier closed cases on the same device were not matched to a documented typology. Found by expanding the card-device graph from the flagged transaction.",
+    "affected_txn_ids": [
+      "3503878"
+    ],
+    "first_suspicious_txn_id": "3503878",
+    "connected_card_ids": [
+      "C06224-K2",
+      "C11309-K1"
+    ],
+    "connected_device_profiles": [],
+    "exposure_usd": 99.92,
+    "evidence": [
+      {
+        "claim": "Bank model risk score on transaction 3503878 is 0.90 (an input, not a verdict; weight 0 in the evidence scorer)",
+        "source": "graph",
+        "ref": "query:get_transaction(as_of=2016-12-01 22:28:53, txn=3503878)#call-1",
+        "entity_ids": [
+          "3503878"
+        ]
+      },
+      {
+        "claim": "Device ring: 2 other customers' cards used the same fully specified device profile in the last 30 days, each with window transactions whose identity record marks the device New (contribution +0.29 logit)",
+        "source": "graph",
+        "ref": "query:shared_origin_scan(as_of=2016-12-01 22:28:53, card=C07987-K2, window_days=30, max_degree=50)#call-4",
+        "entity_ids": [
+          "C06224-K2",
+          "C11309-K1"
+        ]
+      },
+      {
+        "claim": "3 earlier confirmed-fraud closed case(s) on this card, closed before the alert (contribution +0.82 logit)",
+        "source": "graph",
+        "ref": "query:case_history(as_of=2016-12-01 22:28:53, customer=C07987)#call-6",
+        "entity_ids": [
+          "CC-2011",
+          "CC-2860",
+          "CC-5026"
+        ]
+      },
+      {
+        "claim": "12 similar closed cases (lexical similarity ≥ 0.35): weighted fraud share 0.98 vs history base rate 0.84; patterns {'undocumented': 4, 'card_not_present_new_device': 8} (contribution +0.00 logit)",
+        "source": "graph",
+        "ref": "query:similar_cases_vector(as_of=2016-12-01 22:28:53, qv=<35 values>, top_k=20)#call-8",
+        "entity_ids": [
+          "CC-1494",
+          "CC-2649",
+          "CC-2971",
+          "CC-2985",
+          "CC-3035"
+        ]
+      },
+      {
+        "claim": "Familiar aspects: amount typical for the card; product code used before (contribution +0.00 logit)",
+        "source": "graph",
+        "ref": "query:card_history(as_of=2016-12-01 22:28:53, card=C07987-K2, lookback_days=180)#call-3",
+        "entity_ids": [
+          "3503878"
+        ]
+      },
+      {
+        "claim": "Simulated: step-up authentication for further activity was not completed (treated as denial) (pre-response probability 0.61 ≥ 0.60 deny threshold)",
+        "source": "customer",
+        "ref": "evidence_request:1",
+        "entity_ids": [
+          "3503878"
+        ]
+      },
+      {
+        "claim": "Policy/pattern text retrieved: 3b. The next best action can change Recommend what the evidence supports now, then request more evidence if the policy calls for it, then recommend again. Example: probability 0.45 on a single signal, so the initial acti",
+        "source": "document",
+        "ref": "document:README#§3b",
+        "entity_ids": [
+          "policy-3b"
+        ]
+      },
+      {
+        "claim": "Policy/pattern text retrieved: \"3a. A case is not a report Two different things, and the agent produces both. **A case** (`CREATE_CASE`) is the bank's internal record of an investigation. Open one whenever fraud probability reaches 0.30, whenever you ",
+        "source": "document",
+        "ref": "document:README#§3a",
+        "entity_ids": [
+          "policy-3a"
+        ]
+      }
+    ],
+    "similar_prior_cases": [
+      "CC-2011",
+      "CC-2860",
+      "CC-5026",
+      "CC-5528",
+      "CC-2800"
+    ],
+    "summary": "Alert on transaction 3503878 ($99.92, online) for card C07987-K2 was triggered by a bank model risk score of 0.90. Assessed fraud probability is 0.93; the activity is judged fraud (an undocumented pattern) covering 1 transaction(s) and $99.92. Key evidence: Device ring: 2 other customers' cards used the same fully specified device profile in the last 30 days, each with window transactions whose identity record marks the device New; 3 earlier confirmed-fraud closed case(s) on this card, closed before the alert; 12 similar closed cases (lexical similarity ≥ 0.35): weighted fraud share 0.98 vs history base rate 0.84; patterns {'undocumented': 4, 'card_not_present_new_device': 8}. A step up auth request was made and its response was simulated as 'deny'. Final actions: BLOCK_CARD, CREATE_CASE, FILE_REPORT, MONITOR_CONNECTED_CARDS, ESCALATE_TO_ANALYST.",
+    "written_to_graph": true,
+    "graph_case_id": "INV-HHG-019-784319fbda"
+  },
+  "evidence_requests": [
+    {
+      "type": "step_up_auth",
+      "asked_after_step": 10,
+      "assumed_response": "Simulated: step-up authentication for further activity was not completed (treated as denial) (pre-response probability 0.61 ≥ 0.60 deny threshold)"
+    }
+  ],
+  "next_best_actions": {
+    "initial": [
+      {
+        "action": "STEP_UP_AUTH",
+        "route": "auto",
+        "reason": "R1: case rests on at most one signal and probability 0.61 < 0.70; verify before any block; §3b: evidence requested before the final recommendation"
+      },
+      {
+        "action": "CREATE_CASE",
+        "route": "auto",
+        "reason": "R6: 3 cards show fraud sharing DeviceProfile Windows | other | chrome 61.0 | 1280x720 within 30 days; R9: coordinated or repeated abuse across customers matching no documented pattern; §3a: evidence requested; §3a: a report always has a case behind it"
+      },
+      {
+        "action": "FILE_REPORT",
+        "route": "L2",
+        "reason": "R6: 3 cards show fraud sharing DeviceProfile Windows | other | chrome 61.0 | 1280x720 within 30 days; R9: coordinated or repeated abuse across customers matching no documented pattern"
+      },
+      {
+        "action": "MONITOR_CONNECTED_CARDS",
+        "route": "auto",
+        "reason": "R6: 3 cards show fraud sharing DeviceProfile Windows | other | chrome 61.0 | 1280x720 within 30 days"
+      },
+      {
+        "action": "ESCALATE_TO_ANALYST",
+        "route": "auto",
+        "reason": "R9: coordinated or repeated abuse across customers matching no documented pattern"
+      }
+    ],
+    "final": [
+      {
+        "action": "BLOCK_CARD",
+        "route": "L1",
+        "reason": "R2: customer denied the transaction (simulated response); exposure $99.92 ≤ $2,500"
+      },
+      {
+        "action": "CREATE_CASE",
+        "route": "auto",
+        "reason": "R2: customer denied the transaction (simulated response); R6: 3 cards show fraud sharing DeviceProfile Windows | other | chrome 61.0 | 1280x720 within 30 days; R9: coordinated or repeated abuse across customers matching no documented pattern; §3a: evidence requested; §3a: a report always has a case behind it"
+      },
+      {
+        "action": "FILE_REPORT",
+        "route": "L2",
+        "reason": "R2: connects to shared DeviceProfile Windows | other | chrome 61.0 | 1280x720 with another card's fraud; R6: 3 cards show fraud sharing DeviceProfile Windows | other | chrome 61.0 | 1280x720 within 30 days; R9: coordinated or repeated abuse across customers matching no documented pattern; §3a: fraud strongly suspected and shared DeviceProfile Windows | other | chrome 61.0 | 1280x720 links to another card's fraud"
+      },
+      {
+        "action": "MONITOR_CONNECTED_CARDS",
+        "route": "auto",
+        "reason": "R6: 3 cards show fraud sharing DeviceProfile Windows | other | chrome 61.0 | 1280x720 within 30 days"
+      },
+      {
+        "action": "ESCALATE_TO_ANALYST",
+        "route": "auto",
+        "reason": "R9: coordinated or repeated abuse across customers matching no documented pattern"
+      }
+    ],
+    "what_changed": "The simulated deny response moved the fraud probability from 0.61 to 0.93 and the verdict to fraud. Final actions add BLOCK_CARD and drop STEP_UP_AUTH."
+  },
+  "sar": {
+    "file": true,
+    "reason": "R2: connects to shared DeviceProfile Windows | other | chrome 61.0 | 1280x720 with another card's fraud; R6: 3 cards show fraud sharing DeviceProfile Windows | other | chrome 61.0 | 1280x720 within 30 days; R9: coordinated or repeated abuse across customers matching no documented pattern; §3a: fraud strongly suspected and shared DeviceProfile Windows | other | chrome 61.0 | 1280x720 links to another card's fraud",
+    "narrative": "This report concerns customer C07987 and card C07987-K2. Between 2016-12-01 and 2016-12-01, 1 transaction(s) totalling $99.92 were identified as part of one suspicious episode (3503878). The activity was online (card not present) and the alert was raised by a bank model risk score of 0.90 on transaction 3503878. The activity is assessed as an undocumented pattern with a fraud probability of 0.93. Device ring: 2 other customers' cards used the same fully specified device profile in the last 30 days, each with window transactions whose identity record marks the device New. 3 earlier confirmed-fraud closed case(s) on this card, closed before the alert. 12 similar closed cases (lexical similarity ≥ 0.35): weighted fraud share 0.98 vs history base rate 0.84; patterns {'undocumented': 4, 'card_not_present_new_device': 8}. The same origin links this card to 2 other card(s): C06224-K2, C11309-K1. A simulated step up auth response was recorded as 'deny'. It is suspicious because Device ring: 2 other customers' cards used the same fully specified device profile in the last 30 days, each with window transactions whose identity record marks the device New; 3 earlier confirmed-fraud closed case(s) on this card, closed before the alert. Recommended actions: BLOCK_CARD, CREATE_CASE, FILE_REPORT, MONITOR_CONNECTED_CARDS, ESCALATE_TO_ANALYST. All amounts are in USD; product codes and region codes are dataset codes, and no merchant identifiers exist in the data.",
+    "subjects": [
+      "C07987",
+      "C07987-K2",
+      "C06224-K2",
+      "C11309-K1"
+    ],
+    "total_amount_usd": 99.92,
+    "activity_dates": [
+      "2016-12-01",
+      "2016-12-01"
+    ]
+  },
+  "stop_reason": "The simulated verification response settled the question (README §6); probability 0.93. Further steps would not change the actions.",
+  "tool_calls": 9,
+  "tokens": 0,
+  "latency_s": 3.68
+}

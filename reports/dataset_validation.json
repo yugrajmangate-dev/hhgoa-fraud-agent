@@ -1,0 +1,1384 @@
+{
+  "generated_at": "2026-09-24T16:21:17.564247+00:00",
+  "data_dir": "C:\\Users\\yugra\\source\\hhgoa-fraud-agent\\data\\raw",
+  "baseline": "C:\\Users\\yugra\\source\\hhgoa-fraud-agent\\config\\raw_dataset_manifest.json",
+  "summary": {
+    "pass": 85,
+    "warn": 3,
+    "fail": 0
+  },
+  "manifest": {
+    "README.md": {
+      "bytes": 38663,
+      "sha256": "57e6dd7c7766b4efe3e903f111be2f4237d058d53e3b1738d6e56dcd6cecda59"
+    },
+    "transactions.csv": {
+      "bytes": 707936515,
+      "sha256": "dd084e58d7c33e7fd5a59c7b992ba9d6f62b0bd443fb19d4a5d5212e0246bb2b"
+    },
+    "identity.csv": {
+      "bytes": 26716154,
+      "sha256": "9ebd6740ecb7e2afd392b5082a6f349907e871144659f622f5302ecd4ca39fad"
+    },
+    "closed_cases_history.csv": {
+      "bytes": 2706417,
+      "sha256": "840613948d023fc3ddbfcb3291d5be250ee328e6eba1d2810b010fca5a757854"
+    },
+    "case_pack.csv": {
+      "bytes": 3548,
+      "sha256": "353494638b6ec2f07af67257b90ab85a1f1d537a0f015089abd9b54cfc7596e4"
+    }
+  },
+  "checks": [
+    {
+      "id": "file_exists:README.md",
+      "category": "files",
+      "status": "pass",
+      "expected": true,
+      "observed": true,
+      "detail": ""
+    },
+    {
+      "id": "file_exists:transactions.csv",
+      "category": "files",
+      "status": "pass",
+      "expected": true,
+      "observed": true,
+      "detail": ""
+    },
+    {
+      "id": "file_exists:identity.csv",
+      "category": "files",
+      "status": "pass",
+      "expected": true,
+      "observed": true,
+      "detail": ""
+    },
+    {
+      "id": "file_exists:closed_cases_history.csv",
+      "category": "files",
+      "status": "pass",
+      "expected": true,
+      "observed": true,
+      "detail": ""
+    },
+    {
+      "id": "file_exists:case_pack.csv",
+      "category": "files",
+      "status": "pass",
+      "expected": true,
+      "observed": true,
+      "detail": ""
+    },
+    {
+      "id": "integrity:unchanged:README.md",
+      "category": "integrity",
+      "status": "pass",
+      "expected": {
+        "bytes": 38663,
+        "sha256": "57e6dd7c7766b4efe3e903f111be2f4237d058d53e3b1738d6e56dcd6cecda59"
+      },
+      "observed": {
+        "bytes": 38663,
+        "sha256": "57e6dd7c7766b4efe3e903f111be2f4237d058d53e3b1738d6e56dcd6cecda59"
+      },
+      "detail": "SHA-256 and size must equal the pinned baseline"
+    },
+    {
+      "id": "integrity:unchanged:transactions.csv",
+      "category": "integrity",
+      "status": "pass",
+      "expected": {
+        "bytes": 707936515,
+        "sha256": "dd084e58d7c33e7fd5a59c7b992ba9d6f62b0bd443fb19d4a5d5212e0246bb2b"
+      },
+      "observed": {
+        "bytes": 707936515,
+        "sha256": "dd084e58d7c33e7fd5a59c7b992ba9d6f62b0bd443fb19d4a5d5212e0246bb2b"
+      },
+      "detail": "SHA-256 and size must equal the pinned baseline"
+    },
+    {
+      "id": "integrity:unchanged:identity.csv",
+      "category": "integrity",
+      "status": "pass",
+      "expected": {
+        "bytes": 26716154,
+        "sha256": "9ebd6740ecb7e2afd392b5082a6f349907e871144659f622f5302ecd4ca39fad"
+      },
+      "observed": {
+        "bytes": 26716154,
+        "sha256": "9ebd6740ecb7e2afd392b5082a6f349907e871144659f622f5302ecd4ca39fad"
+      },
+      "detail": "SHA-256 and size must equal the pinned baseline"
+    },
+    {
+      "id": "integrity:unchanged:closed_cases_history.csv",
+      "category": "integrity",
+      "status": "pass",
+      "expected": {
+        "bytes": 2706417,
+        "sha256": "840613948d023fc3ddbfcb3291d5be250ee328e6eba1d2810b010fca5a757854"
+      },
+      "observed": {
+        "bytes": 2706417,
+        "sha256": "840613948d023fc3ddbfcb3291d5be250ee328e6eba1d2810b010fca5a757854"
+      },
+      "detail": "SHA-256 and size must equal the pinned baseline"
+    },
+    {
+      "id": "integrity:unchanged:case_pack.csv",
+      "category": "integrity",
+      "status": "pass",
+      "expected": {
+        "bytes": 3548,
+        "sha256": "353494638b6ec2f07af67257b90ab85a1f1d537a0f015089abd9b54cfc7596e4"
+      },
+      "observed": {
+        "bytes": 3548,
+        "sha256": "353494638b6ec2f07af67257b90ab85a1f1d537a0f015089abd9b54cfc7596e4"
+      },
+      "detail": "SHA-256 and size must equal the pinned baseline"
+    },
+    {
+      "id": "integrity:no_extra_files",
+      "category": "integrity",
+      "status": "pass",
+      "expected": [],
+      "observed": [],
+      "detail": ""
+    },
+    {
+      "id": "columns:required:transactions.csv",
+      "category": "columns",
+      "status": "pass",
+      "expected": "all present",
+      "observed": "all present",
+      "detail": ""
+    },
+    {
+      "id": "columns:no_unexpected:transactions.csv",
+      "category": "columns",
+      "status": "pass",
+      "expected": [],
+      "observed": [],
+      "detail": ""
+    },
+    {
+      "id": "columns:no_duplicates:transactions.csv",
+      "category": "columns",
+      "status": "pass",
+      "expected": [],
+      "observed": [],
+      "detail": ""
+    },
+    {
+      "id": "columns:count:transactions.csv",
+      "category": "columns",
+      "status": "pass",
+      "expected": 397,
+      "observed": 397,
+      "detail": ""
+    },
+    {
+      "id": "columns:required:identity.csv",
+      "category": "columns",
+      "status": "pass",
+      "expected": "all present",
+      "observed": "all present",
+      "detail": ""
+    },
+    {
+      "id": "columns:no_unexpected:identity.csv",
+      "category": "columns",
+      "status": "pass",
+      "expected": [],
+      "observed": [],
+      "detail": ""
+    },
+    {
+      "id": "columns:no_duplicates:identity.csv",
+      "category": "columns",
+      "status": "pass",
+      "expected": [],
+      "observed": [],
+      "detail": ""
+    },
+    {
+      "id": "columns:count:identity.csv",
+      "category": "columns",
+      "status": "pass",
+      "expected": 41,
+      "observed": 41,
+      "detail": ""
+    },
+    {
+      "id": "columns:required:closed_cases_history.csv",
+      "category": "columns",
+      "status": "pass",
+      "expected": "all present",
+      "observed": "all present",
+      "detail": ""
+    },
+    {
+      "id": "columns:no_unexpected:closed_cases_history.csv",
+      "category": "columns",
+      "status": "pass",
+      "expected": [],
+      "observed": [],
+      "detail": ""
+    },
+    {
+      "id": "columns:no_duplicates:closed_cases_history.csv",
+      "category": "columns",
+      "status": "pass",
+      "expected": [],
+      "observed": [],
+      "detail": ""
+    },
+    {
+      "id": "columns:count:closed_cases_history.csv",
+      "category": "columns",
+      "status": "pass",
+      "expected": 15,
+      "observed": 15,
+      "detail": ""
+    },
+    {
+      "id": "columns:required:case_pack.csv",
+      "category": "columns",
+      "status": "pass",
+      "expected": "all present",
+      "observed": "all present",
+      "detail": ""
+    },
+    {
+      "id": "columns:no_unexpected:case_pack.csv",
+      "category": "columns",
+      "status": "pass",
+      "expected": [],
+      "observed": [],
+      "detail": ""
+    },
+    {
+      "id": "columns:no_duplicates:case_pack.csv",
+      "category": "columns",
+      "status": "pass",
+      "expected": [],
+      "observed": [],
+      "detail": ""
+    },
+    {
+      "id": "columns:count:case_pack.csv",
+      "category": "columns",
+      "status": "pass",
+      "expected": 8,
+      "observed": 8,
+      "detail": ""
+    },
+    {
+      "id": "rows:transactions.csv",
+      "category": "rows",
+      "status": "pass",
+      "expected": 590742,
+      "observed": 590742,
+      "detail": ""
+    },
+    {
+      "id": "rows:identity.csv",
+      "category": "rows",
+      "status": "pass",
+      "expected": 144432,
+      "observed": 144432,
+      "detail": ""
+    },
+    {
+      "id": "rows:closed_cases_history.csv",
+      "category": "rows",
+      "status": "pass",
+      "expected": 5565,
+      "observed": 5565,
+      "detail": ""
+    },
+    {
+      "id": "rows:case_pack.csv",
+      "category": "rows",
+      "status": "pass",
+      "expected": 20,
+      "observed": 20,
+      "detail": ""
+    },
+    {
+      "id": "rows:closed_cases_outcome_split",
+      "category": "rows",
+      "status": "pass",
+      "expected": {
+        "confirmed_fraud": 4665,
+        "cleared": 900
+      },
+      "observed": {
+        "confirmed_fraud": 4665,
+        "cleared": 900
+      },
+      "detail": ""
+    },
+    {
+      "id": "unique:transactions.TransactionID",
+      "category": "keys",
+      "status": "pass",
+      "expected": 0,
+      "observed": 0,
+      "detail": ""
+    },
+    {
+      "id": "format:transactions.TransactionID",
+      "category": "keys",
+      "status": "pass",
+      "expected": "all match \\d+",
+      "observed": 0,
+      "detail": ""
+    },
+    {
+      "id": "unique:identity.TransactionID",
+      "category": "keys",
+      "status": "pass",
+      "expected": 0,
+      "observed": 0,
+      "detail": ""
+    },
+    {
+      "id": "format:identity.TransactionID",
+      "category": "keys",
+      "status": "pass",
+      "expected": "all match \\d+",
+      "observed": 0,
+      "detail": ""
+    },
+    {
+      "id": "unique:closed_cases.case_id",
+      "category": "keys",
+      "status": "pass",
+      "expected": 0,
+      "observed": 0,
+      "detail": ""
+    },
+    {
+      "id": "format:closed_cases.case_id",
+      "category": "keys",
+      "status": "pass",
+      "expected": "all match CC-\\d{4}",
+      "observed": 0,
+      "detail": ""
+    },
+    {
+      "id": "unique:case_pack.case_id",
+      "category": "keys",
+      "status": "pass",
+      "expected": 0,
+      "observed": 0,
+      "detail": ""
+    },
+    {
+      "id": "format:case_pack.case_id",
+      "category": "keys",
+      "status": "pass",
+      "expected": "all match HHG-\\d{3}",
+      "observed": 0,
+      "detail": ""
+    },
+    {
+      "id": "format:transactions.customer_id",
+      "category": "keys",
+      "status": "pass",
+      "expected": "all match C\\d{5}",
+      "observed": 0,
+      "detail": ""
+    },
+    {
+      "id": "format:card_ids",
+      "category": "keys",
+      "status": "pass",
+      "expected": "all match C\\d{5}-K\\d+",
+      "observed": 0,
+      "detail": ""
+    },
+    {
+      "id": "enum:transactions.channel",
+      "category": "enums",
+      "status": "pass",
+      "expected": [
+        "in_person",
+        "online"
+      ],
+      "observed": [
+        "in_person",
+        "online"
+      ],
+      "detail": ""
+    },
+    {
+      "id": "enum:transactions.ProductCD",
+      "category": "enums",
+      "status": "pass",
+      "expected": [
+        "C",
+        "H",
+        "R",
+        "S",
+        "W"
+      ],
+      "observed": [
+        "C",
+        "H",
+        "R",
+        "S",
+        "W"
+      ],
+      "detail": ""
+    },
+    {
+      "id": "enum:closed_cases.outcome",
+      "category": "enums",
+      "status": "pass",
+      "expected": [
+        "cleared",
+        "confirmed_fraud"
+      ],
+      "observed": [
+        "cleared",
+        "confirmed_fraud"
+      ],
+      "detail": ""
+    },
+    {
+      "id": "enum:closed_cases.pattern",
+      "category": "enums",
+      "status": "pass",
+      "expected": [
+        "account_takeover",
+        "card_not_present_fraud",
+        "card_not_present_new_device",
+        "card_testing",
+        "none",
+        "out_of_region_use",
+        "undocumented"
+      ],
+      "observed": [
+        "account_takeover",
+        "card_not_present_fraud",
+        "card_not_present_new_device",
+        "card_testing",
+        "none",
+        "out_of_region_use",
+        "undocumented"
+      ],
+      "detail": ""
+    },
+    {
+      "id": "enum:closed_cases.report_filed",
+      "category": "enums",
+      "status": "pass",
+      "expected": [
+        "No",
+        "Yes"
+      ],
+      "observed": [
+        "No",
+        "Yes"
+      ],
+      "detail": ""
+    },
+    {
+      "id": "enum:closed_cases.actions_taken",
+      "category": "enums",
+      "status": "pass",
+      "expected": [
+        "ALLOW_TRANSACTION",
+        "BLOCK_ALL_CARDS",
+        "BLOCK_CARD",
+        "CLOSE_NO_FRAUD",
+        "CREATE_CASE",
+        "DECLINE_TRANSACTION",
+        "ESCALATE_TO_ANALYST",
+        "FILE_REPORT",
+        "GENERATE_REPORT",
+        "MONITOR_CARD",
+        "MONITOR_CONNECTED_CARDS",
+        "STEP_UP_AUTH",
+        "VERIFY_WITH_CUSTOMER",
+        "WARN_CUSTOMER"
+      ],
+      "observed": [
+        "BLOCK_CARD",
+        "CLOSE_NO_FRAUD",
+        "CREATE_CASE",
+        "FILE_REPORT",
+        "VERIFY_WITH_CUSTOMER"
+      ],
+      "detail": ""
+    },
+    {
+      "id": "enum:case_pack.trigger_type",
+      "category": "enums",
+      "status": "pass",
+      "expected": [
+        "analyst_request",
+        "customer_report",
+        "risk_score"
+      ],
+      "observed": [
+        "analyst_request",
+        "customer_report",
+        "risk_score"
+      ],
+      "detail": ""
+    },
+    {
+      "id": "range:transactions.risk_score",
+      "category": "values",
+      "status": "pass",
+      "expected": "numeric in [0, 1]",
+      "observed": {
+        "non_numeric": 0,
+        "min": 0.01,
+        "max": 0.99
+      },
+      "detail": ""
+    },
+    {
+      "id": "range:transactions.TransactionAmt",
+      "category": "values",
+      "status": "pass",
+      "expected": "numeric > 0",
+      "observed": {
+        "non_numeric": 0,
+        "min": 0.27,
+        "max": 31937.38
+      },
+      "detail": ""
+    },
+    {
+      "id": "time:transactions.ts_parseable",
+      "category": "time",
+      "status": "pass",
+      "expected": 0,
+      "observed": 0,
+      "detail": "format %Y-%m-%d %H:%M:%S"
+    },
+    {
+      "id": "time:transactions.ts_range",
+      "category": "time",
+      "status": "pass",
+      "expected": "2016-07-02 .. 2016-12-31",
+      "observed": [
+        "2016-07-02 00:02:21",
+        "2016-12-31 23:58:54"
+      ],
+      "detail": ""
+    },
+    {
+      "id": "time:ts_equals_origin_plus_TransactionDT",
+      "category": "time",
+      "status": "pass",
+      "expected": 0,
+      "observed": 0,
+      "detail": "origin 2016-07-02 00:00:00 (DATASET_NOTES.md \u00a75)"
+    },
+    {
+      "id": "time:transactions_sorted_by_ts",
+      "category": "time",
+      "status": "pass",
+      "expected": true,
+      "observed": true,
+      "detail": ""
+    },
+    {
+      "id": "time:closed_cases.opened_at_parseable",
+      "category": "time",
+      "status": "pass",
+      "expected": 0,
+      "observed": 0,
+      "detail": ""
+    },
+    {
+      "id": "time:closed_cases.closed_at_parseable",
+      "category": "time",
+      "status": "pass",
+      "expected": 0,
+      "observed": 0,
+      "detail": ""
+    },
+    {
+      "id": "time:case_pack.opened_at_parseable",
+      "category": "time",
+      "status": "pass",
+      "expected": 0,
+      "observed": 0,
+      "detail": ""
+    },
+    {
+      "id": "time:closed_cases.closed_after_opened",
+      "category": "time",
+      "status": "pass",
+      "expected": 0,
+      "observed": 0,
+      "detail": ""
+    },
+    {
+      "id": "time:closed_cases.within_july_october",
+      "category": "time",
+      "status": "warn",
+      "expected": "README: closed cases July to October",
+      "observed": {
+        "opened_in_november": 25,
+        "closed_in_november": 158,
+        "latest_closed_at": "2016-11-06 23:39:58"
+      },
+      "detail": "Documented discrepancy; see DATASET_NOTES.md \u00a77"
+    },
+    {
+      "id": "time:case_pack.in_november_december",
+      "category": "time",
+      "status": "pass",
+      "expected": [
+        "2016-11",
+        "2016-12"
+      ],
+      "observed": [
+        "2016-11",
+        "2016-12"
+      ],
+      "detail": ""
+    },
+    {
+      "id": "time:closed_cases.all_closed_before_first_benchmark",
+      "category": "time",
+      "status": "pass",
+      "expected": 0,
+      "observed": 0,
+      "detail": "earliest benchmark opened_at 2016-11-12 00:46:24; latest closed_at 2016-11-06 23:39:58"
+    },
+    {
+      "id": "join:identity_to_transactions",
+      "category": "joins",
+      "status": "pass",
+      "expected": 0,
+      "observed": 0,
+      "detail": ""
+    },
+    {
+      "id": "join:identity_only_online",
+      "category": "joins",
+      "status": "pass",
+      "expected": {
+        "online": 144432
+      },
+      "observed": {
+        "online": 144432
+      },
+      "detail": ""
+    },
+    {
+      "id": "join:productcd_W_iff_in_person",
+      "category": "joins",
+      "status": "pass",
+      "expected": 0,
+      "observed": 0,
+      "detail": ""
+    },
+    {
+      "id": "join:online_transactions_with_identity",
+      "category": "joins",
+      "status": "warn",
+      "expected": 0,
+      "observed": 6640,
+      "detail": "README: device record present for online; some online rows have none"
+    },
+    {
+      "id": "join:customer_id_one_to_one_card1",
+      "category": "joins",
+      "status": "pass",
+      "expected": true,
+      "observed": {
+        "customers_with_multiple_card1": 0,
+        "card1_with_multiple_customers": 0
+      },
+      "detail": ""
+    },
+    {
+      "id": "join:closed_case_txns_exist",
+      "category": "joins",
+      "status": "pass",
+      "expected": 0,
+      "observed": 0,
+      "detail": ""
+    },
+    {
+      "id": "join:closed_case_txn_customer_matches",
+      "category": "joins",
+      "status": "pass",
+      "expected": 0,
+      "observed": 0,
+      "detail": ""
+    },
+    {
+      "id": "join:closed_case_card_id_matches_derived_rule",
+      "category": "joins",
+      "status": "pass",
+      "expected": 0,
+      "observed": 0,
+      "detail": "Validates the inferred card_id rule (DATASET_NOTES.md \u00a74)"
+    },
+    {
+      "id": "join:txn_in_at_most_one_closed_case",
+      "category": "joins",
+      "status": "pass",
+      "expected": 0,
+      "observed": 0,
+      "detail": ""
+    },
+    {
+      "id": "join:closed_case_card_ids_exist",
+      "category": "joins",
+      "status": "pass",
+      "expected": 0,
+      "observed": 0,
+      "detail": ""
+    },
+    {
+      "id": "join:connected_card_ids_exist",
+      "category": "joins",
+      "status": "pass",
+      "expected": [],
+      "observed": [],
+      "detail": ""
+    },
+    {
+      "id": "time:closed_case_txns_before_opened_at",
+      "category": "time",
+      "status": "pass",
+      "expected": 0,
+      "observed": 0,
+      "detail": ""
+    },
+    {
+      "id": "consistency:closed_cases.n_txns",
+      "category": "consistency",
+      "status": "pass",
+      "expected": 0,
+      "observed": 0,
+      "detail": ""
+    },
+    {
+      "id": "consistency:first_fraud_txn_in_txn_ids",
+      "category": "consistency",
+      "status": "pass",
+      "expected": 0,
+      "observed": 0,
+      "detail": ""
+    },
+    {
+      "id": "consistency:cleared_have_no_first_fraud_txn",
+      "category": "consistency",
+      "status": "pass",
+      "expected": 0,
+      "observed": 0,
+      "detail": ""
+    },
+    {
+      "id": "consistency:first_fraud_txn_is_earliest",
+      "category": "consistency",
+      "status": "warn",
+      "expected": [],
+      "observed": [
+        "CC-2649"
+      ],
+      "detail": "first_fraud_txn_id is not the earliest listed transaction"
+    },
+    {
+      "id": "consistency:exposure_equals_sum_of_amounts",
+      "category": "consistency",
+      "status": "pass",
+      "expected": [],
+      "observed": [],
+      "detail": "confirmed fraud: sum |TransactionAmt| of txn_ids; cleared: 0"
+    },
+    {
+      "id": "benchmark:case_ids_HHG-001_to_HHG-020",
+      "category": "benchmark",
+      "status": "pass",
+      "expected": [
+        "HHG-001",
+        "HHG-002",
+        "HHG-003",
+        "HHG-004",
+        "HHG-005",
+        "HHG-006",
+        "HHG-007",
+        "HHG-008",
+        "HHG-009",
+        "HHG-010",
+        "HHG-011",
+        "HHG-012",
+        "HHG-013",
+        "HHG-014",
+        "HHG-015",
+        "HHG-016",
+        "HHG-017",
+        "HHG-018",
+        "HHG-019",
+        "HHG-020"
+      ],
+      "observed": [
+        "HHG-001",
+        "HHG-002",
+        "HHG-003",
+        "HHG-004",
+        "HHG-005",
+        "HHG-006",
+        "HHG-007",
+        "HHG-008",
+        "HHG-009",
+        "HHG-010",
+        "HHG-011",
+        "HHG-012",
+        "HHG-013",
+        "HHG-014",
+        "HHG-015",
+        "HHG-016",
+        "HHG-017",
+        "HHG-018",
+        "HHG-019",
+        "HHG-020"
+      ],
+      "detail": ""
+    },
+    {
+      "id": "benchmark:flagged_txns_exist",
+      "category": "benchmark",
+      "status": "pass",
+      "expected": 0,
+      "observed": 0,
+      "detail": ""
+    },
+    {
+      "id": "benchmark:flagged_txn_customer_matches",
+      "category": "benchmark",
+      "status": "pass",
+      "expected": 0,
+      "observed": 0,
+      "detail": ""
+    },
+    {
+      "id": "benchmark:flagged_txn_card_matches_derived_rule",
+      "category": "benchmark",
+      "status": "pass",
+      "expected": 0,
+      "observed": 0,
+      "detail": ""
+    },
+    {
+      "id": "time:flagged_txn_before_case_opened",
+      "category": "time",
+      "status": "pass",
+      "expected": "lag >= 0 h",
+      "observed": {
+        "min_h": 1.0,
+        "max_h": 6.0
+      },
+      "detail": ""
+    },
+    {
+      "id": "benchmark:risk_score_present_iff_risk_trigger",
+      "category": "benchmark",
+      "status": "pass",
+      "expected": true,
+      "observed": true,
+      "detail": ""
+    },
+    {
+      "id": "benchmark:risk_score_matches_transaction",
+      "category": "benchmark",
+      "status": "pass",
+      "expected": 0,
+      "observed": 0,
+      "detail": ""
+    },
+    {
+      "id": "benchmark:trigger_text_amount_matches",
+      "category": "benchmark",
+      "status": "pass",
+      "expected": 0,
+      "observed": 0,
+      "detail": ""
+    },
+    {
+      "id": "benchmark:trigger_text_txn_id_matches",
+      "category": "benchmark",
+      "status": "pass",
+      "expected": 0,
+      "observed": 0,
+      "detail": ""
+    }
+  ],
+  "asof_availability": [
+    {
+      "case_id": "HHG-001",
+      "as_of": "2016-12-05 01:55:28",
+      "flagged_txn_id": "3514030",
+      "flagged_ts": "2016-12-04 19:55:28",
+      "txns_visible": 515135,
+      "txns_future": 75607,
+      "identity_visible": 127728,
+      "customer_txns_visible": 360,
+      "customer_txns_future": 62,
+      "card_txns_visible": 360,
+      "card_txns_future": 62,
+      "customer_cards_visible": [
+        "C12382-K1"
+      ],
+      "customer_cards_all_time": [
+        "C12382-K1"
+      ],
+      "closed_cases_visible": 5565,
+      "closed_cases_opened_not_closed": 0,
+      "customer_closed_cases_visible": 4
+    },
+    {
+      "case_id": "HHG-002",
+      "as_of": "2016-11-22 23:27:07",
+      "flagged_txn_id": "3478782",
+      "flagged_ts": "2016-11-22 17:27:07",
+      "txns_visible": 479798,
+      "txns_future": 110944,
+      "identity_visible": 121815,
+      "customer_txns_visible": 36,
+      "customer_txns_future": 8,
+      "card_txns_visible": 36,
+      "card_txns_future": 8,
+      "customer_cards_visible": [
+        "C11891-K1"
+      ],
+      "customer_cards_all_time": [
+        "C11891-K1"
+      ],
+      "closed_cases_visible": 5565,
+      "closed_cases_opened_not_closed": 0,
+      "customer_closed_cases_visible": 1
+    },
+    {
+      "case_id": "HHG-003",
+      "as_of": "2016-12-10 15:01:21",
+      "flagged_txn_id": "3530164",
+      "flagged_ts": "2016-12-10 13:01:21",
+      "txns_visible": 530461,
+      "txns_future": 60281,
+      "identity_visible": 130882,
+      "customer_txns_visible": 986,
+      "customer_txns_future": 154,
+      "card_txns_visible": 981,
+      "card_txns_future": 153,
+      "customer_cards_visible": [
+        "C08623-K1",
+        "C08623-K2"
+      ],
+      "customer_cards_all_time": [
+        "C08623-K1",
+        "C08623-K2"
+      ],
+      "closed_cases_visible": 5565,
+      "closed_cases_opened_not_closed": 0,
+      "customer_closed_cases_visible": 6
+    },
+    {
+      "case_id": "HHG-004",
+      "as_of": "2016-12-29 07:53:54",
+      "flagged_txn_id": "3583227",
+      "flagged_ts": "2016-12-29 01:53:54",
+      "txns_visible": 583490,
+      "txns_future": 7252,
+      "identity_visible": 143157,
+      "customer_txns_visible": 210,
+      "customer_txns_future": 6,
+      "card_txns_visible": 210,
+      "card_txns_future": 6,
+      "customer_cards_visible": [
+        "C08106-K1"
+      ],
+      "customer_cards_all_time": [
+        "C08106-K1"
+      ],
+      "closed_cases_visible": 5565,
+      "closed_cases_opened_not_closed": 0,
+      "customer_closed_cases_visible": 4
+    },
+    {
+      "case_id": "HHG-005",
+      "as_of": "2016-12-08 03:38:37",
+      "flagged_txn_id": "3523199",
+      "flagged_ts": "2016-12-07 21:38:37",
+      "txns_visible": 524186,
+      "txns_future": 66556,
+      "identity_visible": 129469,
+      "customer_txns_visible": 91,
+      "customer_txns_future": 1,
+      "card_txns_visible": 91,
+      "card_txns_future": 1,
+      "customer_cards_visible": [
+        "C02923-K1"
+      ],
+      "customer_cards_all_time": [
+        "C02923-K1"
+      ],
+      "closed_cases_visible": 5565,
+      "closed_cases_opened_not_closed": 0,
+      "customer_closed_cases_visible": 3
+    },
+    {
+      "case_id": "HHG-006",
+      "as_of": "2016-11-22 02:30:00",
+      "flagged_txn_id": "3476682",
+      "flagged_ts": "2016-11-21 20:30:00",
+      "txns_visible": 477626,
+      "txns_future": 113116,
+      "identity_visible": 121464,
+      "customer_txns_visible": 201,
+      "customer_txns_future": 60,
+      "card_txns_visible": 201,
+      "card_txns_future": 60,
+      "customer_cards_visible": [
+        "C07297-K1"
+      ],
+      "customer_cards_all_time": [
+        "C07297-K1"
+      ],
+      "closed_cases_visible": 5565,
+      "closed_cases_opened_not_closed": 0,
+      "customer_closed_cases_visible": 0
+    },
+    {
+      "case_id": "HHG-007",
+      "as_of": "2016-12-05 03:46:14",
+      "flagged_txn_id": "3514948",
+      "flagged_ts": "2016-12-05 00:46:14",
+      "txns_visible": 515365,
+      "txns_future": 75377,
+      "identity_visible": 127784,
+      "customer_txns_visible": 2436,
+      "customer_txns_future": 356,
+      "card_txns_visible": 2435,
+      "card_txns_future": 353,
+      "customer_cards_visible": [
+        "C09933-K1",
+        "C09933-K2"
+      ],
+      "customer_cards_all_time": [
+        "C09933-K1",
+        "C09933-K2"
+      ],
+      "closed_cases_visible": 5565,
+      "closed_cases_opened_not_closed": 0,
+      "customer_closed_cases_visible": 19
+    },
+    {
+      "case_id": "HHG-008",
+      "as_of": "2016-12-20 03:08:56",
+      "flagged_txn_id": "3558054",
+      "flagged_ts": "2016-12-19 22:08:56",
+      "txns_visible": 558876,
+      "txns_future": 31866,
+      "identity_visible": 137716,
+      "customer_txns_visible": 901,
+      "customer_txns_future": 27,
+      "card_txns_visible": 900,
+      "card_txns_future": 27,
+      "customer_cards_visible": [
+        "C13171-K1",
+        "C13171-K2"
+      ],
+      "customer_cards_all_time": [
+        "C13171-K1",
+        "C13171-K2"
+      ],
+      "closed_cases_visible": 5565,
+      "closed_cases_opened_not_closed": 0,
+      "customer_closed_cases_visible": 19
+    },
+    {
+      "case_id": "HHG-009",
+      "as_of": "2016-12-28 17:10:53",
+      "flagged_txn_id": "3581141",
+      "flagged_ts": "2016-12-28 12:10:53",
+      "txns_visible": 581800,
+      "txns_future": 8942,
+      "identity_visible": 142862,
+      "customer_txns_visible": 47,
+      "customer_txns_future": 9,
+      "card_txns_visible": 47,
+      "card_txns_future": 9,
+      "customer_cards_visible": [
+        "C08299-K1"
+      ],
+      "customer_cards_all_time": [
+        "C08299-K1"
+      ],
+      "closed_cases_visible": 5565,
+      "closed_cases_opened_not_closed": 0,
+      "customer_closed_cases_visible": 0
+    },
+    {
+      "case_id": "HHG-010",
+      "as_of": "2016-12-02 18:18:27",
+      "flagged_txn_id": "3506725",
+      "flagged_ts": "2016-12-02 15:18:27",
+      "txns_visible": 507379,
+      "txns_future": 83363,
+      "identity_visible": 126460,
+      "customer_txns_visible": 34,
+      "customer_txns_future": 2,
+      "card_txns_visible": 34,
+      "card_txns_future": 2,
+      "customer_cards_visible": [
+        "C10434-K1"
+      ],
+      "customer_cards_all_time": [
+        "C10434-K1"
+      ],
+      "closed_cases_visible": 5565,
+      "closed_cases_opened_not_closed": 0,
+      "customer_closed_cases_visible": 1
+    },
+    {
+      "case_id": "HHG-011",
+      "as_of": "2016-12-29 06:27:44",
+      "flagged_txn_id": "3583368",
+      "flagged_ts": "2016-12-29 03:27:44",
+      "txns_visible": 583462,
+      "txns_future": 7280,
+      "identity_visible": 143154,
+      "customer_txns_visible": 10341,
+      "customer_txns_future": 20,
+      "card_txns_visible": 10312,
+      "card_txns_future": 20,
+      "customer_cards_visible": [
+        "C11923-K1",
+        "C11923-K2"
+      ],
+      "customer_cards_all_time": [
+        "C11923-K1",
+        "C11923-K2"
+      ],
+      "closed_cases_visible": 5565,
+      "closed_cases_opened_not_closed": 0,
+      "customer_closed_cases_visible": 11
+    },
+    {
+      "case_id": "HHG-012",
+      "as_of": "2016-12-18 05:00:31",
+      "flagged_txn_id": "3553342",
+      "flagged_ts": "2016-12-18 04:00:31",
+      "txns_visible": 553396,
+      "txns_future": 37346,
+      "identity_visible": 136626,
+      "customer_txns_visible": 914,
+      "customer_txns_future": 77,
+      "card_txns_visible": 911,
+      "card_txns_future": 77,
+      "customer_cards_visible": [
+        "C05876-K1",
+        "C05876-K2"
+      ],
+      "customer_cards_all_time": [
+        "C05876-K1",
+        "C05876-K2"
+      ],
+      "closed_cases_visible": 5565,
+      "closed_cases_opened_not_closed": 0,
+      "customer_closed_cases_visible": 2
+    },
+    {
+      "case_id": "HHG-013",
+      "as_of": "2016-12-09 05:39:29",
+      "flagged_txn_id": "3526826",
+      "flagged_ts": "2016-12-09 02:39:29",
+      "txns_visible": 527045,
+      "txns_future": 63697,
+      "identity_visible": 130061,
+      "customer_txns_visible": 1441,
+      "customer_txns_future": 128,
+      "card_txns_visible": 1433,
+      "card_txns_future": 128,
+      "customer_cards_visible": [
+        "C07671-K1",
+        "C07671-K2"
+      ],
+      "customer_cards_all_time": [
+        "C07671-K1",
+        "C07671-K2"
+      ],
+      "closed_cases_visible": 5565,
+      "closed_cases_opened_not_closed": 0,
+      "customer_closed_cases_visible": 4
+    },
+    {
+      "case_id": "HHG-014",
+      "as_of": "2016-11-22 20:11:00",
+      "flagged_txn_id": "3478561",
+      "flagged_ts": "2016-11-22 16:11:00",
+      "txns_visible": 479234,
+      "txns_future": 111508,
+      "identity_visible": 121738,
+      "customer_txns_visible": 73,
+      "customer_txns_future": 12,
+      "card_txns_visible": 73,
+      "card_txns_future": 12,
+      "customer_cards_visible": [
+        "C13487-K1"
+      ],
+      "customer_cards_all_time": [
+        "C13487-K1"
+      ],
+      "closed_cases_visible": 5565,
+      "closed_cases_opened_not_closed": 0,
+      "customer_closed_cases_visible": 0
+    },
+    {
+      "case_id": "HHG-015",
+      "as_of": "2016-11-17 19:03:36",
+      "flagged_txn_id": "3464869",
+      "flagged_ts": "2016-11-17 14:03:36",
+      "txns_visible": 465695,
+      "txns_future": 125047,
+      "identity_visible": 119277,
+      "customer_txns_visible": 69,
+      "customer_txns_future": 10,
+      "card_txns_visible": 69,
+      "card_txns_future": 10,
+      "customer_cards_visible": [
+        "C03042-K1"
+      ],
+      "customer_cards_all_time": [
+        "C03042-K1"
+      ],
+      "closed_cases_visible": 5565,
+      "closed_cases_opened_not_closed": 0,
+      "customer_closed_cases_visible": 3
+    },
+    {
+      "case_id": "HHG-016",
+      "as_of": "2016-12-12 01:39:08",
+      "flagged_txn_id": "3534820",
+      "flagged_ts": "2016-12-11 22:39:08",
+      "txns_visible": 535330,
+      "txns_future": 55412,
+      "identity_visible": 132030,
+      "customer_txns_visible": 49,
+      "customer_txns_future": 12,
+      "card_txns_visible": 49,
+      "card_txns_future": 12,
+      "customer_cards_visible": [
+        "C09988-K1"
+      ],
+      "customer_cards_all_time": [
+        "C09988-K1"
+      ],
+      "closed_cases_visible": 5565,
+      "closed_cases_opened_not_closed": 0,
+      "customer_closed_cases_visible": 0
+    },
+    {
+      "case_id": "HHG-017",
+      "as_of": "2016-11-12 00:46:24",
+      "flagged_txn_id": "3450629",
+      "flagged_ts": "2016-11-11 23:46:24",
+      "txns_visible": 450793,
+      "txns_future": 139949,
+      "identity_visible": 116484,
+      "customer_txns_visible": 53,
+      "customer_txns_future": 6,
+      "card_txns_visible": 53,
+      "card_txns_future": 6,
+      "customer_cards_visible": [
+        "C04570-K1"
+      ],
+      "customer_cards_all_time": [
+        "C04570-K1"
+      ],
+      "closed_cases_visible": 5565,
+      "closed_cases_opened_not_closed": 0,
+      "customer_closed_cases_visible": 1
+    },
+    {
+      "case_id": "HHG-018",
+      "as_of": "2016-11-27 14:41:26",
+      "flagged_txn_id": "3491361",
+      "flagged_ts": "2016-11-27 13:41:26",
+      "txns_visible": 491533,
+      "txns_future": 99209,
+      "identity_visible": 123837,
+      "customer_txns_visible": 5867,
+      "customer_txns_future": 1224,
+      "card_txns_visible": 5863,
+      "card_txns_future": 1216,
+      "customer_cards_visible": [
+        "C02354-K1",
+        "C02354-K2"
+      ],
+      "customer_cards_all_time": [
+        "C02354-K1",
+        "C02354-K2"
+      ],
+      "closed_cases_visible": 5565,
+      "closed_cases_opened_not_closed": 0,
+      "customer_closed_cases_visible": 20
+    },
+    {
+      "case_id": "HHG-019",
+      "as_of": "2016-12-01 22:28:53",
+      "flagged_txn_id": "3503878",
+      "flagged_ts": "2016-12-01 17:28:53",
+      "txns_visible": 504916,
+      "txns_future": 85826,
+      "identity_visible": 126103,
+      "customer_txns_visible": 221,
+      "customer_txns_future": 27,
+      "card_txns_visible": 220,
+      "card_txns_future": 27,
+      "customer_cards_visible": [
+        "C07987-K1",
+        "C07987-K2"
+      ],
+      "customer_cards_all_time": [
+        "C07987-K1",
+        "C07987-K2"
+      ],
+      "closed_cases_visible": 5565,
+      "closed_cases_opened_not_closed": 0,
+      "customer_closed_cases_visible": 4
+    },
+    {
+      "case_id": "HHG-020",
+      "as_of": "2016-12-03 12:04:26",
+      "flagged_txn_id": "3509359",
+      "flagged_ts": "2016-12-03 06:04:26",
+      "txns_visible": 509532,
+      "txns_future": 81210,
+      "identity_visible": 126794,
+      "customer_txns_visible": 84,
+      "customer_txns_future": 28,
+      "card_txns_visible": 83,
+      "card_txns_future": 26,
+      "customer_cards_visible": [
+        "C12265-K1",
+        "C12265-K2"
+      ],
+      "customer_cards_all_time": [
+        "C12265-K1",
+        "C12265-K2"
+      ],
+      "closed_cases_visible": 5565,
+      "closed_cases_opened_not_closed": 0,
+      "customer_closed_cases_visible": 2
+    }
+  ]
+}
