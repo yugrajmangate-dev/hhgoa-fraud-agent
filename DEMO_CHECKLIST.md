@@ -26,15 +26,15 @@ Open http://localhost:8501. The health check `curl http://localhost:8501/_stcore
 
 | # | Screen | Must be visible |
 |---|---|---|
-| 1 | Page top | Yellow **SIMULATED ENVIRONMENT** banner |
-| 2 | Sidebar | Case selector showing **HHG-017 (recommended demo case)**, run ID, mode `--llm off`, tokens 0 |
+| 1 | Page top | **SIMULATED ENVIRONMENT** banner; KPI cards (verdict, fraud probability, model risk score, approval route, evidence items). There is no confidence card: the answer files have no confidence field |
+| 2 | Sidebar | **HHG-017 demo** button highlighted, case selector showing `HHG-017 · legitimate · p 0.03`, run ID, mode `--llm off`, tokens 0 |
 | 3 | 1. Case input | Trigger `risk_score`, as_of `2016-11-12 00:46:24`, flagged `3450629`, card `C04570-K1` |
-| 4 | 2. Graph evidence and provenance | 8 calls table (params include `as_of=2016-11-12 00:46:24`), evidence list with `query:…#call-n` refs, entity graph |
+| 4 | 2. Graph evidence and provenance | Three separate tabs. **Graph calls**: 8 calls (params include `as_of=2016-11-12 00:46:24`). Click **Evidence**: rows with `query:…#call-n` refs. **Entity graph** is optional for HHG-017 |
 | 5 | 3. Assessment and initial decision | p = 0.34, initial `VERIFY_WITH_CUSTOMER`, `CREATE_CASE` (auto) |
-| 6 | 4. Additional evidence | Red **SIMULATED** box: customer confirms (0.34 ≤ 0.40) |
+| 6 | 4. Additional evidence | Amber **SIMULATED** panel: customer confirms (0.34 ≤ 0.40) |
 | 7 | 5. Final decision | Verdict legitimate, p 0.03, `CREATE_CASE`, `CLOSE_NO_FRAUD`, SAR not filed, what changed |
 | 8 | 6. Audit trail | Hash chain **verified** (42 events), graph case `INV-HHG-017-0e29f8b20a`, read-back **verified** |
-| 9 | Switch to HHG-014 | Device ring (19 other customers' cards), `undocumented`, R6/R9 actions, `FILE_REPORT` route **L2**, `DECLINE_TRANSACTION` route **L1**, cited CC-2649/2971/2985/3035 |
+| 9 | **HHG-014 ring** button | Device ring (19 other customers' cards; the **Entity graph** tab draws the first 12), `undocumented`, R6/R9 actions, `FILE_REPORT` route **L2**, `DECLINE_TRANSACTION` route **L1**, cited CC-2649/2971/2985/3035; verdict stays **uncertain at 0.51** |
 | 10 | Terminal | `verify_cases.py` → `20/20` |
 
 ## Do not

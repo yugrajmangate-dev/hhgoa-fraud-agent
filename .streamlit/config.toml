@@ -1,14 +1,31 @@
 # UI theme only (no logic). Read by `streamlit run ui/app.py` from the project root.
+# Light and dark variants are both defined, so the viewer can switch in the app's settings menu.
 [theme]
-base = "dark"
+primaryColor = "#3B82F6"
+font = "sans-serif"
+baseRadius = "medium"
+showSidebarBorder = true
+
+[theme.dark]
 primaryColor = "#3B82F6"
 backgroundColor = "#0B1220"
 secondaryBackgroundColor = "#111A2B"
 textColor = "#E5E7EB"
-font = "sans serif"
+borderColor = "#24324D"
+
+[theme.light]
+primaryColor = "#2563EB"
+backgroundColor = "#FFFFFF"
+secondaryBackgroundColor = "#F1F5F9"
+textColor = "#0F172A"
+borderColor = "#CBD5E1"
 
 [server]
 headless = true
 
 [browser]
 gatherUsageStats = false
+
+[client]
+# Hide developer-only toolbar items (e.g. Deploy) for a clean demo recording.
+toolbarMode = "minimal"

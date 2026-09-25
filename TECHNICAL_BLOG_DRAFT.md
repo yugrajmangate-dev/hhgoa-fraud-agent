@@ -128,11 +128,13 @@ Approval routes come from the README table: `BLOCK_CARD` goes to L1 up to $2,500
 | Check | Result |
 |---|---|
 | Answer files | Exactly `cases/HHG-001.json` … `HHG-020.json` |
-| Independent verifier | **20/20** pass every check |
+| Independent verifier | The saved report (`reports/phase2_verification.json`) recorded **20/20** passing every check |
 | Tests | **77** passing |
 | Architecture checks | **51/51** |
 | Mode | Deterministic `--llm off`, tokens 0 |
 | Outcomes | **8 fraud · 11 uncertain · 1 legitimate**; 6 with a (simulated) SAR |
+
+The verifier result is the one recorded in the saved report, not a live re-run. The verifier's TigerGraph read-back step needs a running Savanna workspace, and it was not re-run for this draft because the workspace was returning errors.
 
 One case shows what the graph adds. **HHG-014** is an analyst alert about an unusual device.
 - **The ring:** a one-hop expansion found 19 other customers' cards using the same fully specified device profile within 30 days of the alert. Each has window transactions where identity marks the device New.
@@ -150,19 +152,24 @@ One case shows what the graph adds. **HHG-014** is an analyst alert about an unu
 
 ## 13. Reproduce it
 
+Use Python 3.11. `requirements-dev.txt` is the full environment: pipeline, tests and verifier. `requirements.txt` only covers the read-only Streamlit Community Cloud UI.
+
+Create `.env` in the project root with your own Savanna workspace's `TG_HOST` and `TG_SECRET`. It is git-ignored, so never commit it. There is no `.env.example`. Optional settings are `TG_GRAPHNAME` (default `FraudGraph`), `TG_TGCLOUD`, `TG_RESTPP_PORT` and `TG_GS_PORT` (default `443`). Place the official dataset, unchanged, in `data/raw/`.
+
 ```bash
-python -m venv .venv && .venv/Scripts/python -m pip install -r requirements.txt
-cp .env.example .env                     # fill in your own Savanna host and secret; never commit .env
+python -m venv .venv && .venv/Scripts/python -m pip install -r requirements-dev.txt
 export PYTHONPATH=src
-.venv/Scripts/python scripts/validate_dataset.py      # dataset integrity (official data in data/raw/)
+.venv/Scripts/python scripts/validate_dataset.py      # dataset integrity against pinned hashes (official data in data/raw/)
 .venv/Scripts/python -m hhg.etl.build                 # staging files + build gates
-.venv/Scripts/python -m hhg.graph.admin all           # schema, loading, install queries, verify counts
+.venv/Scripts/python -m hhg.graph.admin all           # schema, loading jobs, install queries, verify counts
 .venv/Scripts/python -m hhg.cli run all --llm off     # 20 cases in as_of order -> cases/
-.venv/Scripts/python scripts/verify_cases.py          # independent verification (expects 20/20)
+.venv/Scripts/python scripts/verify_cases.py          # independent verifier (needs the workspace running; --no-graph = offline checks only)
 .venv/Scripts/python -m unittest discover -s tests    # 77 tests
 .venv/Scripts/streamlit run ui/app.py                 # analyst UI (HHG-017 recommended)
 ```
 
-Links: code [GITHUB_URL] · video [VIDEO_URL] · demo [DEMO_URL]
+Both verifier modes overwrite `reports/phase2_verification.json`. To restore the committed report after a run, use `git checkout -- reports/phase2_verification.json`.
+
+Links: code https://github.com/yugrajmangate-dev/hhgoa-fraud-agent · video https://drive.google.com/file/d/1x-mD2mFXfPI7lzsxYUAJc7HECJYNSBv3/view?usp=drivesdk · demo https://hhgoa-fraud-agent-nsnwuabuzigfmhe4kdl4cp.streamlit.app/
 
 Thanks to @TigerGraphDB and @247pmstudio for the challenge and the dataset.
