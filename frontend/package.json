@@ -1,0 +1,25 @@
+{
+  "name": "hhgoa-analyst-cockpit",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Static React analyst cockpit for the HHGoa fraud-investigation benchmark artifacts.",
+  "scripts": {
+    "dev": "vite",
+    "typecheck": "tsc --noEmit",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview --port 4173 --strictPort",
+    "export-data": "cd .. && .venv/Scripts/python frontend/scripts/export_data.py"
+  },
+  "dependencies": {
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.1.1",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.1"
+  }
+}

@@ -1,0 +1,1591 @@
+{
+ "case_id": "HHG-015",
+ "run_id": "HHG-015-20260924T203642Z",
+ "as_of": "2016-11-17 19:03:36",
+ "source": {
+  "answer_file": "cases/HHG-015.json",
+  "run_dir": "runs/cases/HHG-015-20260924T203642Z",
+  "answer_sha256": "249f8ef4a8911838bb667c4d582112a83fa4dcfb6f6ddd2ca5717c0609ab95ad",
+  "trace_sha256": "916aa3a0eb28b5c6b1ca4ee0ece366c69912671338868c7f9f20c6f4d89a9e99",
+  "audit_sha256": "7766815a42c069ab699bdbe1e4c298d2393fcc73bef630090596b0a47da61f02"
+ },
+ "answer": {
+  "case_id": "HHG-015",
+  "case": {
+   "status": "escalated",
+   "verdict": "uncertain",
+   "fraud_probability": 0.67,
+   "pattern": "card_not_present_new_device",
+   "pattern_description": "",
+   "affected_txn_ids": [
+    "3464869"
+   ],
+   "first_suspicious_txn_id": "3464869",
+   "connected_card_ids": [
+    "C07466-K2"
+   ],
+   "connected_device_profiles": [
+    "Windows | Windows 10 | firefox 59.0 | 1920x1080"
+   ],
+   "exposure_usd": 599.94,
+   "evidence": [
+    {
+     "claim": "Bank model risk score on transaction 3464869 is 0.77 (an input, not a verdict; weight 0 in the evidence scorer)",
+     "source": "graph",
+     "ref": "query:get_transaction(as_of=2016-11-17 19:03:36, txn=3464869)#call-1",
+     "entity_ids": [
+      "3464869"
+     ]
+    },
+    {
+     "claim": "DeviceProfile 'Windows | Windows 10 | firefox 59.0 | 1920x1080' is shared in the last 30 days with 1 other card(s) whose confirmed-fraud transactions used it in that window (CC-5481) (contribution +0.14 logit)",
+     "source": "graph",
+     "ref": "query:shared_origin_scan(as_of=2016-11-17 19:03:36, card=C03042-K1, window_days=30, max_degree=50)#call-4",
+     "entity_ids": [
+      "C07466-K2"
+     ]
+    },
+    {
+     "claim": "2 earlier confirmed-fraud closed case(s) on this card, closed before the alert (contribution +0.82 logit)",
+     "source": "graph",
+     "ref": "query:case_history(as_of=2016-11-17 19:03:36, customer=C03042)#call-6",
+     "entity_ids": [
+      "CC-0615",
+      "CC-3886"
+     ]
+    },
+    {
+     "claim": "12 similar closed cases (lexical similarity ≥ 0.35): weighted fraud share 0.98 vs history base rate 0.84; patterns {'undocumented': 4, 'card_not_present_new_device': 8} (contribution +0.00 logit)",
+     "source": "graph",
+     "ref": "query:similar_cases_vector(as_of=2016-11-17 19:03:36, qv=<35 values>, top_k=20)#call-8",
+     "entity_ids": [
+      "CC-1494",
+      "CC-2649",
+      "CC-2971",
+      "CC-2985",
+      "CC-3035"
+     ]
+    },
+    {
+     "claim": "Familiar aspects: product code used before (contribution +0.00 logit)",
+     "source": "graph",
+     "ref": "query:card_history(as_of=2016-11-17 19:03:36, card=C03042-K1, lookback_days=180)#call-3",
+     "entity_ids": [
+      "3464869"
+     ]
+    },
+    {
+     "claim": "Simulated: no reply within 24 hours (pre-response probability 0.58 is between the 0.40 confirm and 0.60 deny thresholds)",
+     "source": "customer",
+     "ref": "evidence_request:1",
+     "entity_ids": [
+      "3464869"
+     ]
+    },
+    {
+     "claim": "Policy/pattern text retrieved: 3. Card-not-present fraud from a new device. Same as above, with the identity record marking the device as `New` for this account, sometimes behind a proxy. Stronger than pattern 2, still not proof: people buy new phones",
+     "source": "document",
+     "ref": "document:README#card_not_present_new_device",
+     "entity_ids": [
+      "pattern-card_not_present_new_device"
+     ]
+    },
+    {
+     "claim": "Policy/pattern text retrieved: R4. No reply within 24 hours. Recommend `MONITOR_CARD` and `DECLINE_TRANSACTION` for pending authorizations. Escalate if exposure exceeds $500.",
+     "source": "document",
+     "ref": "document:README#R4",
+     "entity_ids": [
+      "policy-R4"
+     ]
+    },
+    {
+     "claim": "Policy/pattern text retrieved: \"3a. A case is not a report Two different things, and the agent produces both. **A case** (`CREATE_CASE`) is the bank's internal record of an investigation. Open one whenever fraud probability reaches 0.30, whenever you ",
+     "source": "document",
+     "ref": "document:README#§3a",
+     "entity_ids": [
+      "policy-3a"
+     ]
+    }
+   ],
+   "similar_prior_cases": [
+    "CC-0615",
+    "CC-3886",
+    "CC-5481"
+   ],
+   "summary": "Alert on transaction 3464869 ($599.94, online) for card C03042-K1 was triggered by a bank model risk score of 0.77. Assessed fraud probability is 0.67; the evidence does not settle the question (leading hypothesis: card-not-present fraud from a new device). Key evidence: DeviceProfile 'Windows | Windows 10 | firefox 59.0 | 1920x1080' is shared in the last 30 days with 1 other card(s) whose confirmed-fraud transactions used it in that window (CC-5481); 2 earlier confirmed-fraud closed case(s) on this card, closed before the alert; 12 similar closed cases (lexical similarity ≥ 0.35): weighted fraud share 0.98 vs history base rate 0.84; patterns {'undocumented': 4, 'card_not_present_new_device': 8}. A step up auth request was made and its response was simulated as 'no_reply'. Final actions: DECLINE_TRANSACTION, CREATE_CASE, MONITOR_CARD, ESCALATE_TO_ANALYST.",
+   "written_to_graph": true,
+   "graph_case_id": "INV-HHG-015-9fe7682578"
+  },
+  "evidence_requests": [
+   {
+    "type": "step_up_auth",
+    "asked_after_step": 10,
+    "assumed_response": "Simulated: no reply within 24 hours (pre-response probability 0.58 is between the 0.40 confirm and 0.60 deny thresholds)"
+   }
+  ],
+  "next_best_actions": {
+   "initial": [
+    {
+     "action": "STEP_UP_AUTH",
+     "route": "auto",
+     "reason": "R1: case rests on at most one signal and probability 0.58 < 0.70; verify before any block; §3b: evidence requested before the final recommendation"
+    },
+    {
+     "action": "CREATE_CASE",
+     "route": "auto",
+     "reason": "§3a: evidence requested"
+    },
+    {
+     "action": "ESCALATE_TO_ANALYST",
+     "route": "auto",
+     "reason": "R8: verdict uncertain and exposure $599.94 > $500"
+    }
+   ],
+   "final": [
+    {
+     "action": "DECLINE_TRANSACTION",
+     "route": "L1",
+     "reason": "R4: no reply within 24 hours; decline pending authorizations"
+    },
+    {
+     "action": "CREATE_CASE",
+     "route": "auto",
+     "reason": "§3a: evidence requested"
+    },
+    {
+     "action": "MONITOR_CARD",
+     "route": "auto",
+     "reason": "R4: no reply within 24 hours (simulated)"
+    },
+    {
+     "action": "ESCALATE_TO_ANALYST",
+     "route": "auto",
+     "reason": "R4: no reply and exposure $599.94 > $500; R8: verdict uncertain and exposure $599.94 > $500"
+    }
+   ],
+   "what_changed": "The simulated no reply response moved the fraud probability from 0.58 to 0.67 and the verdict to uncertain. Final actions add DECLINE_TRANSACTION, MONITOR_CARD and drop STEP_UP_AUTH."
+  },
+  "sar": {
+   "file": false,
+   "reason": "§3a: no report; fraud is not confirmed or strongly suspected together with exposure over $1,000, a shared origin, or an undocumented coordinated pattern",
+   "narrative": "",
+   "subjects": [],
+   "total_amount_usd": 0,
+   "activity_dates": []
+  },
+  "stop_reason": "No reply within 24 hours was assumed; policy R4 actions apply and the remaining uncertainty is handed on as recorded. Further automated steps are unlikely to change the decision.",
+  "tool_calls": 9,
+  "tokens": 0,
+  "latency_s": 3.58
+ },
+ "trigger": {
+  "case_id": "HHG-015",
+  "opened_at": "2016-11-17 19:03:36",
+  "trigger_type": "risk_score",
+  "trigger_text": "Real-time model scored transaction 3464869 ($599.94, online) at 0.77. Review and decide.",
+  "flagged_txn_id": "3464869",
+  "card_id": "C03042-K1",
+  "customer_id": "C03042",
+  "risk_score": "0.77"
+ },
+ "assessment": {
+  "initial": {
+   "p": 0.58,
+   "n_support": 1,
+   "n_exculpatory": 0,
+   "conflict": false,
+   "coverage": 1.0,
+   "statement": "none",
+   "contributions": {
+    "F8_network": 0.1445,
+    "F9_prior": 0.825
+   }
+  },
+  "final": {
+   "p": 0.67,
+   "n_support": 2,
+   "n_exculpatory": 0,
+   "conflict": false,
+   "coverage": 1.0,
+   "statement": "no_reply",
+   "contributions": {
+    "F8_network": 0.1445,
+    "F9_prior": 0.825,
+    "F12_response": 0.4055
+   }
+  }
+ },
+ "policy": {
+  "fired": {
+   "initial": [
+    "R1",
+    "R8"
+   ],
+   "final": [
+    "R4",
+    "R8"
+   ]
+  },
+  "final": {
+   "verdict": "uncertain",
+   "pattern": "card_not_present_new_device",
+   "exposure": 599.94,
+   "response": "no_reply",
+   "shared_link": true,
+   "shared_element": "DeviceProfile Windows | Windows 10 | firefox 59.0 | 1920x1080",
+   "shared_cards": 1,
+   "evidence_request_type": "step_up_auth"
+  }
+ },
+ "families": [
+  {
+   "name": "F1_amount",
+   "s": 0.0,
+   "available": true,
+   "entities": [
+    "3464869"
+   ],
+   "claim": "Flagged amount $599.94 vs card median $99.93 over 65 earlier visible transactions (robust z = 1.6)",
+   "refs": [
+    "query:card_history(as_of=2016-11-17 19:03:36, card=C03042-K1, lookback_days=180)#call-3"
+   ],
+   "detail": {
+    "z": 1.61,
+    "median_amt": 99.93,
+    "n_base": 65
+   }
+  },
+  {
+   "name": "F2_product",
+   "s": 0.0,
+   "available": true,
+   "entities": [
+    "3464869"
+   ],
+   "claim": "Product code R used 23 times before on this card",
+   "refs": [
+    "query:card_history(as_of=2016-11-17 19:03:36, card=C03042-K1, lookback_days=180)#call-3"
+   ],
+   "detail": {
+    "product_cd": "R",
+    "seen": {
+     "H": 19,
+     "S": 9,
+     "R": 23,
+     "C": 5,
+     "W": 9
+    }
+   }
+  },
+  {
+   "name": "F3_burst",
+   "s": 0.0,
+   "available": true,
+   "entities": [
+    "3464869"
+   ],
+   "claim": "1 online transactions on the card in the 48 hours up to the alert (about 0.8 expected from the card's visible history)",
+   "refs": [
+    "query:card_history(as_of=2016-11-17 19:03:36, card=C03042-K1, lookback_days=180)#call-3"
+   ],
+   "detail": {
+    "n_online_48h": 1,
+    "expected_48h": 0.81
+   }
+  },
+  {
+   "name": "F4_device",
+   "s": 0.6,
+   "available": true,
+   "entities": [
+    "3464869"
+   ],
+   "claim": "Device profile 'Trident/7.0 | Windows 8.1 | ie 11.0 for desktop | 1680x1050': identity marks it New; not seen on this card before",
+   "refs": [
+    "query:card_history(as_of=2016-11-17 19:03:36, card=C03042-K1, lookback_days=180)#call-3"
+   ],
+   "detail": {
+    "profile": "Trident/7.0 | Windows 8.1 | ie 11.0 for desktop | 1680x1050",
+    "id_15": "New",
+    "proxy": "",
+    "new_to_card": true,
+    "familiar": false
+   }
+  },
+  {
+   "name": "F6_testing",
+   "s": 0.0,
+   "available": true,
+   "entities": [],
+   "claim": "No card-testing sequence (3+ small online authorizations within an hour, then a larger purchase)",
+   "refs": [
+    "query:card_history(as_of=2016-11-17 19:03:36, card=C03042-K1, lookback_days=180)#call-3"
+   ],
+   "detail": {}
+  },
+  {
+   "name": "F7_takeover",
+   "s": 0.0,
+   "available": true,
+   "entities": [
+    "3464869"
+   ],
+   "claim": "No credential anomalies found",
+   "refs": [
+    "query:card_history(as_of=2016-11-17 19:03:36, card=C03042-K1, lookback_days=180)#call-3"
+   ],
+   "detail": {
+    "anomalies": []
+   }
+  },
+  {
+   "name": "F13_recurring",
+   "s": 0.0,
+   "available": true,
+   "entities": [
+    "3464869"
+   ],
+   "claim": "No monthly recurring charge matching the flagged amount",
+   "refs": [
+    "query:card_history(as_of=2016-11-17 19:03:36, card=C03042-K1, lookback_days=180)#call-3"
+   ],
+   "detail": {
+    "matches": [],
+    "gaps_days": []
+   }
+  },
+  {
+   "name": "F15_structuring",
+   "s": 0.0,
+   "available": true,
+   "entities": [],
+   "claim": "No repeated purchases just under a round threshold",
+   "refs": [
+    "query:card_history(as_of=2016-11-17 19:03:36, card=C03042-K1, lookback_days=180)#call-3"
+   ],
+   "detail": {}
+  },
+  {
+   "name": "F5_region",
+   "s": 0.0,
+   "available": true,
+   "entities": [
+    "3464869"
+   ],
+   "claim": "Billing region 327.0 has no history on this card; home region 325.0",
+   "refs": [
+    "query:card_history(as_of=2016-11-17 19:03:36, card=C03042-K1, lookback_days=180)#call-3"
+   ],
+   "detail": {
+    "addr1": "327.0",
+    "home": "325.0",
+    "novel": true,
+    "concurrent_home": false,
+    "days_in_new_region": 1
+   }
+  },
+  {
+   "name": "F5_trip",
+   "s": 0.0,
+   "available": true,
+   "entities": [
+    "3464869"
+   ],
+   "claim": "1 distinct days of purchases in region 327.0 without concurrent home-region activity, consistent with a trip",
+   "refs": [
+    "query:card_history(as_of=2016-11-17 19:03:36, card=C03042-K1, lookback_days=180)#call-3"
+   ],
+   "detail": {
+    "addr1": "327.0",
+    "home": "325.0",
+    "novel": true,
+    "concurrent_home": false,
+    "days_in_new_region": 1
+   }
+  },
+  {
+   "name": "F8_network",
+   "s": 0.5,
+   "available": true,
+   "entities": [
+    "C07466-K2"
+   ],
+   "claim": "DeviceProfile 'Windows | Windows 10 | firefox 59.0 | 1920x1080' is shared in the last 30 days with 1 other card(s) whose confirmed-fraud transactions used it in that window (CC-5481)",
+   "refs": [
+    "query:shared_origin_scan(as_of=2016-11-17 19:03:36, card=C03042-K1, window_days=30, max_degree=50)#call-4",
+    "query:shared_device_components(as_of=2016-11-17 19:03:36, seed=Trident/7.0 | Windows 8.1 | ie 11.0 for desktop | 1680x1050, window_days=30, max_cards=50, max_hops=1)#call-5"
+   ],
+   "detail": {
+    "links": [
+     {
+      "element": "Windows | Windows 10 | firefox 59.0 | 1920x1080",
+      "kind": "DeviceProfile",
+      "fraud_cards": [
+       "C07466-K2"
+      ],
+      "cases": [
+       "CC-5481"
+      ]
+     }
+    ],
+    "ring_cards": [],
+    "capped": [
+     "anonymous.com",
+     "Windows | Windows 7 | chrome 65.0 | 1920x1080",
+     "126.0",
+     "330.0",
+     "485.0",
+     "327.0",
+     "325.0",
+     "225.0",
+     "299.0",
+     "gmail.com",
+     "184.0"
+    ],
+    "partial_profiles_excluded": []
+   }
+  },
+  {
+   "name": "F9_prior",
+   "s": 1.0,
+   "available": true,
+   "entities": [
+    "CC-0615",
+    "CC-3886"
+   ],
+   "claim": "2 earlier confirmed-fraud closed case(s) on this card, closed before the alert",
+   "refs": [
+    "query:case_history(as_of=2016-11-17 19:03:36, customer=C03042)#call-6"
+   ],
+   "detail": {}
+  },
+  {
+   "name": "F11_memory",
+   "s": 1.0,
+   "available": true,
+   "entities": [
+    "CC-2971",
+    "CC-3035",
+    "CC-2649",
+    "CC-2985",
+    "CC-1494"
+   ],
+   "claim": "12 similar closed cases (lexical similarity ≥ 0.35): weighted fraud share 0.98 vs history base rate 0.84; patterns {'undocumented': 4, 'card_not_present_new_device': 8}",
+   "refs": [
+    "query:similar_cases_vector(as_of=2016-11-17 19:03:36, qv=<35 values>, top_k=20)#call-8"
+   ],
+   "detail": {
+    "fraud_share": 0.98,
+    "n": 12,
+    "pattern_votes": {
+     "undocumented": 4,
+     "card_not_present_new_device": 8
+    }
+   }
+  }
+ ],
+ "linked_cards": [
+  "C07466-K2"
+ ],
+ "envelopes": [
+  {
+   "call_id": "call-1",
+   "tool": "get_transaction",
+   "query": "get_transaction",
+   "params": {
+    "as_of": "2016-11-17 19:03:36",
+    "txn": "3464869"
+   },
+   "executed_at": "2026-09-24T20:36:42.502812+00:00",
+   "row_count": 3,
+   "visible_ids": [
+    "3464869",
+    "C03042",
+    "C03042-K1"
+   ],
+   "result_sha256": "34e8bbd6b222a732dbc9f7c7b892f57823af67e810bf787abb8ac92c125d6afe",
+   "ref": "query:get_transaction(as_of=2016-11-17 19:03:36, txn=3464869)#call-1"
+  },
+  {
+   "call_id": "call-2",
+   "tool": "customer_cards",
+   "query": "customer_cards",
+   "params": {
+    "as_of": "2016-11-17 19:03:36",
+    "customer": "C03042"
+   },
+   "executed_at": "2026-09-24T20:36:42.926757+00:00",
+   "row_count": 1,
+   "visible_ids": [
+    "C03042-K1"
+   ],
+   "result_sha256": "f38cd00602b7d7e28cb3f55e5575010ceec932e686fef60353583d13535a3c22",
+   "ref": "query:customer_cards(as_of=2016-11-17 19:03:36, customer=C03042)#call-2"
+  },
+  {
+   "call_id": "call-3",
+   "tool": "card_history",
+   "query": "card_history",
+   "params": {
+    "as_of": "2016-11-17 19:03:36",
+    "card": "C03042-K1",
+    "lookback_days": 180
+   },
+   "executed_at": "2026-09-24T20:36:43.372674+00:00",
+   "row_count": 69,
+   "visible_ids": [
+    "3001718",
+    "3006031",
+    "3006117",
+    "3006493",
+    "3006928",
+    "3006942",
+    "3011702",
+    "3018410",
+    "3023497",
+    "3023553",
+    "3024194",
+    "3024254",
+    "3032418",
+    "3034574",
+    "3034642",
+    "3038759",
+    "3041946",
+    "3042227",
+    "3051990",
+    "3054453",
+    "3054463",
+    "3054510",
+    "3054511",
+    "3054532",
+    "3063365",
+    "3063943",
+    "3066356",
+    "3072040",
+    "3072772",
+    "3074143",
+    "3080252",
+    "3085777",
+    "3085799",
+    "3086802",
+    "3087822",
+    "3092793",
+    "3096343",
+    "3099575",
+    "3104922",
+    "3113340",
+    "3113745",
+    "3120994",
+    "3150138",
+    "3150821",
+    "3206575",
+    "3209467",
+    "3212410",
+    "3234327",
+    "3240881",
+    "3247861",
+    "3258860",
+    "3269599",
+    "3271785",
+    "3292070",
+    "3302409",
+    "3307015",
+    "3311263",
+    "3357002",
+    "3374300",
+    "3381585",
+    "3395339",
+    "3405413",
+    "3418766",
+    "3437403",
+    "3444271",
+    "3462385",
+    "3462387",
+    "3462404",
+    "3464869"
+   ],
+   "result_sha256": "70e42db9ae20daae9fe7d8c8b10834643c82d7986b30fd08c1209362973cc851",
+   "ref": "query:card_history(as_of=2016-11-17 19:03:36, card=C03042-K1, lookback_days=180)#call-3"
+  },
+  {
+   "call_id": "call-4",
+   "tool": "shared_origin_scan",
+   "query": "shared_origin_scan",
+   "params": {
+    "as_of": "2016-11-17 19:03:36",
+    "card": "C03042-K1",
+    "window_days": 30,
+    "max_degree": 50
+   },
+   "executed_at": "2026-09-24T20:36:43.930362+00:00",
+   "row_count": 95,
+   "visible_ids": [
+    "126.0",
+    "184.0",
+    "225.0",
+    "299.0",
+    "325.0",
+    "327.0",
+    "330.0",
+    "485.0",
+    "C00378-K1",
+    "C00450-K1",
+    "C00750-K2",
+    "C00794-K1",
+    "C00854-K2",
+    "C01104-K2",
+    "C01155-K2",
+    "C01191-K1",
+    "C01377-K1",
+    "C01858-K1",
+    "C01909-K2",
+    "C01982-K2",
+    "C02217-K1",
+    "C02231-K1",
+    "C02371-K2",
+    "C02415-K1",
+    "C02695-K1",
+    "C02716-K2",
+    "C02889-K1",
+    "C02897-K1",
+    "C03040-K2",
+    "C03422-K1",
+    "C03575-K2",
+    "C03630-K1",
+    "C03918-K1",
+    "C04108-K2",
+    "C04112-K1",
+    "C04125-K2",
+    "C04236-K1",
+    "C04309-K2",
+    "C05025-K1",
+    "C05374-K1",
+    "C05560-K2",
+    "C05704-K2",
+    "C05854-K1",
+    "C06026-K2",
+    "C06224-K2",
+    "C06302-K1",
+    "C06605-K1",
+    "C06942-K2",
+    "C06958-K1",
+    "C07035-K1",
+    "C07180-K1",
+    "C07212-K2",
+    "C07311-K1",
+    "C07466-K2",
+    "C07523-K1",
+    "C07673-K1",
+    "C07757-K1",
+    "C07858-K2",
+    "C08489-K2",
+    "C08918-K2",
+    "C09274-K1",
+    "C09414-K1",
+    "C09645-K1",
+    "C09735-K1",
+    "C09918-K1",
+    "C09960-K1",
+    "C09999-K1",
+    "C10320-K1",
+    "C10712-K1",
+    "C11000-K2",
+    "C11001-K1",
+    "C11031-K2",
+    "C11093-K1",
+    "C11246-K1",
+    "C11426-K1",
+    "C11539-K2",
+    "C11920-K1",
+    "C11965-K1",
+    "C12137-K1",
+    "C12441-K1",
+    "C12658-K1",
+    "C12755-K1",
+    "C12897-K1",
+    "C12942-K2",
+    "C12961-K2",
+    "C13328-K1",
+    "C13426-K1",
+    "Trident/7.0 | Windows 8.1 | ie 11.0 for desktop | 1680x1050",
+    "Windows | Windows 10 | firefox 59.0 | 1920x1080",
+    "Windows | Windows 7 | chrome 65.0 | 1280x1024",
+    "Windows | Windows 7 | chrome 65.0 | 1920x1080",
+    "Windows | Windows 8.1 | ie 11.0 for desktop | 1366x768",
+    "anonymous.com",
+    "cox.net",
+    "gmail.com"
+   ],
+   "result_sha256": "64a6116f11fb81b69ea7b11efb4490744893b9eb46a1fac12633da6aca93fd1a",
+   "ref": "query:shared_origin_scan(as_of=2016-11-17 19:03:36, card=C03042-K1, window_days=30, max_degree=50)#call-4"
+  },
+  {
+   "call_id": "call-5",
+   "tool": "shared_device_components",
+   "query": "shared_device_components",
+   "params": {
+    "as_of": "2016-11-17 19:03:36",
+    "seed": "Trident/7.0 | Windows 8.1 | ie 11.0 for desktop | 1680x1050",
+    "window_days": 30,
+    "max_cards": 50,
+    "max_hops": 1
+   },
+   "executed_at": "2026-09-24T20:36:44.348921+00:00",
+   "row_count": 1,
+   "visible_ids": [
+    "C03042-K1"
+   ],
+   "result_sha256": "ae3ff79fb8fab77bc8c73087995b512c144bbc1f2f6f89289158123e3d1e7a27",
+   "ref": "query:shared_device_components(as_of=2016-11-17 19:03:36, seed=Trident/7.0 | Windows 8.1 | ie 11.0 for desktop | 1680x1050, window_days=30, max_cards=50, max_hops=1)#call-5"
+  },
+  {
+   "call_id": "call-6",
+   "tool": "case_history",
+   "query": "case_history",
+   "params": {
+    "as_of": "2016-11-17 19:03:36",
+    "customer": "C03042"
+   },
+   "executed_at": "2026-09-24T20:36:44.779227+00:00",
+   "row_count": 3,
+   "visible_ids": [
+    "CC-0615",
+    "CC-1313",
+    "CC-3886"
+   ],
+   "result_sha256": "c5cc1297caf0b56cd8e2d99200a4d3b0f74c94c0d47f4cc3d06a39bb8e60645a",
+   "ref": "query:case_history(as_of=2016-11-17 19:03:36, customer=C03042)#call-6"
+  },
+  {
+   "call_id": "call-7",
+   "tool": "related_cases_structural",
+   "query": "related_cases_structural",
+   "params": {
+    "as_of": "2016-11-17 19:03:36",
+    "card": "C03042-K1",
+    "window_days": 30,
+    "max_device_txns": 500,
+    "top_k": 10
+   },
+   "executed_at": "2026-09-24T20:36:45.211801+00:00",
+   "row_count": 9,
+   "visible_ids": [
+    "CC-5203",
+    "CC-5227",
+    "CC-5411",
+    "CC-5481",
+    "Trident/7.0 | Windows 8.1 | ie 11.0 for desktop | 1680x1050",
+    "Windows | Windows 10 | firefox 59.0 | 1920x1080",
+    "Windows | Windows 7 | chrome 65.0 | 1280x1024",
+    "Windows | Windows 7 | chrome 65.0 | 1920x1080",
+    "Windows | Windows 8.1 | ie 11.0 for desktop | 1366x768"
+   ],
+   "result_sha256": "4bd6e6f7b3bd7534d9f6d80d246213998de2ac2ab1d108491b851860bced8d9f",
+   "ref": "query:related_cases_structural(as_of=2016-11-17 19:03:36, card=C03042-K1, window_days=30, max_device_txns=500, top_k=10)#call-7"
+  },
+  {
+   "call_id": "call-8",
+   "tool": "similar_cases",
+   "query": "similar_cases_vector",
+   "params": {
+    "as_of": "2016-11-17 19:03:36",
+    "qv": "<35 values>",
+    "top_k": 20
+   },
+   "executed_at": "2026-09-24T20:36:45.442753+00:00",
+   "row_count": 21,
+   "visible_ids": [
+    "CC-0305",
+    "CC-0541",
+    "CC-1414",
+    "CC-1494",
+    "CC-1573",
+    "CC-1664",
+    "CC-1789",
+    "CC-1990",
+    "CC-1995",
+    "CC-2649",
+    "CC-2971",
+    "CC-2985",
+    "CC-3035",
+    "CC-4159",
+    "CC-4343",
+    "CC-4531",
+    "CC-4542",
+    "CC-4563",
+    "CC-5161",
+    "CC-5556",
+    "INV-HHG-017-0e29f8b20a"
+   ],
+   "result_sha256": "e65ab030594d2f3549d56bfe6ea173bb28d495a1d16302576cad0a9a4ec4b67b",
+   "ref": "query:similar_cases_vector(as_of=2016-11-17 19:03:36, qv=<35 values>, top_k=20)#call-8"
+  },
+  {
+   "call_id": "call-9",
+   "tool": "knowledge_search",
+   "query": "knowledge_search",
+   "params": {
+    "as_of": "2016-11-17 19:03:36",
+    "qv": "<30 values>",
+    "top_k": 6
+   },
+   "executed_at": "2026-09-24T20:36:45.660715+00:00",
+   "row_count": 6,
+   "visible_ids": [
+    "pattern-card_not_present_fraud",
+    "pattern-card_not_present_new_device",
+    "pattern-out_of_region_use",
+    "policy-3a",
+    "policy-R3",
+    "policy-R4"
+   ],
+   "result_sha256": "06e18ca81f1e62bbf8add669497301f26b2c6d9a7598f785ddaa9c990979f4fb",
+   "ref": "query:knowledge_search(as_of=2016-11-17 19:03:36, qv=<30 values>, top_k=6)#call-9"
+  }
+ ],
+ "knowledge": [
+  {
+   "chunk_id": "pattern-card_not_present_new_device",
+   "source": "pattern",
+   "section": "card_not_present_new_device",
+   "score": 0.4135
+  },
+  {
+   "chunk_id": "pattern-card_not_present_fraud",
+   "source": "pattern",
+   "section": "card_not_present_fraud",
+   "score": 0.2745
+  },
+  {
+   "chunk_id": "policy-R4",
+   "source": "policy",
+   "section": "R4",
+   "score": 0.2423
+  },
+  {
+   "chunk_id": "pattern-out_of_region_use",
+   "source": "pattern",
+   "section": "out_of_region_use",
+   "score": 0.2418
+  },
+  {
+   "chunk_id": "policy-R3",
+   "source": "policy",
+   "section": "R3",
+   "score": 0.2119
+  },
+  {
+   "chunk_id": "policy-3a",
+   "source": "policy",
+   "section": "§3a",
+   "score": 0.1925
+  }
+ ],
+ "audit": {
+  "chain_verified": true,
+  "n_events": 49,
+  "events": [
+   {
+    "seq": 1,
+    "wall": "2026-09-24T20:36:42.087561+00:00",
+    "event": "state",
+    "hash": "03548dfef3eadc09024593cf999a22cb5228dbee4d30c3f37b58485d2eaa538e",
+    "prev": "0000000000000000000000000000000000000000000000000000000000000000",
+    "state": "INIT",
+    "detail": {
+     "step": 1,
+     "as_of": "2016-11-17 19:03:36",
+     "trigger_type": "risk_score",
+     "llm": "off"
+    }
+   },
+   {
+    "seq": 2,
+    "wall": "2026-09-24T20:36:42.087561+00:00",
+    "event": "state",
+    "hash": "8b6442d7a3c43d79ed6b9bd6cfc61aabaee8caaa5fe42f03febcbf591e8e922f",
+    "prev": "03548dfef3eadc09024593cf999a22cb5228dbee4d30c3f37b58485d2eaa538e",
+    "state": "TRIAGE",
+    "detail": {
+     "step": 2
+    }
+   },
+   {
+    "seq": 3,
+    "wall": "2026-09-24T20:36:42.502812+00:00",
+    "event": "tool_call",
+    "hash": "e9408d521b27ed198e12b6413792824e618a0e0d17deb6e32a9bc51e9321235f",
+    "prev": "8b6442d7a3c43d79ed6b9bd6cfc61aabaee8caaa5fe42f03febcbf591e8e922f",
+    "detail": {
+     "call_id": "call-1",
+     "tool": "get_transaction",
+     "query": "get_transaction",
+     "params": {
+      "as_of": "2016-11-17 19:03:36",
+      "txn": "3464869"
+     },
+     "executed_at": "2026-09-24T20:36:42.502812+00:00",
+     "row_count": 3,
+     "result_sha256": "34e8bbd6b222a732dbc9f7c7b892f57823af67e810bf787abb8ac92c125d6afe",
+     "ref": "query:get_transaction(as_of=2016-11-17 19:03:36, txn=3464869)#call-1"
+    }
+   },
+   {
+    "seq": 4,
+    "wall": "2026-09-24T20:36:42.926757+00:00",
+    "event": "tool_call",
+    "hash": "923a8b6c695d64aaf8620d538fcdb44a9f9c5135bec63dc8068c5e115f426303",
+    "prev": "e9408d521b27ed198e12b6413792824e618a0e0d17deb6e32a9bc51e9321235f",
+    "detail": {
+     "call_id": "call-2",
+     "tool": "customer_cards",
+     "query": "customer_cards",
+     "params": {
+      "as_of": "2016-11-17 19:03:36",
+      "customer": "C03042"
+     },
+     "executed_at": "2026-09-24T20:36:42.926757+00:00",
+     "row_count": 1,
+     "result_sha256": "f38cd00602b7d7e28cb3f55e5575010ceec932e686fef60353583d13535a3c22",
+     "ref": "query:customer_cards(as_of=2016-11-17 19:03:36, customer=C03042)#call-2"
+    }
+   },
+   {
+    "seq": 5,
+    "wall": "2026-09-24T20:36:42.926757+00:00",
+    "event": "state",
+    "hash": "602d350a9616aa6ec24430235b393f34255f0ae9f76bbd9cd32666f9960ddb45",
+    "prev": "923a8b6c695d64aaf8620d538fcdb44a9f9c5135bec63dc8068c5e115f426303",
+    "state": "CONTEXT",
+    "detail": {
+     "step": 3
+    }
+   },
+   {
+    "seq": 6,
+    "wall": "2026-09-24T20:36:43.373672+00:00",
+    "event": "tool_call",
+    "hash": "2cadf2cd2db10370016428e21dc19c8be7c3a8e2b0de829eccf78638a4fd0ca1",
+    "prev": "602d350a9616aa6ec24430235b393f34255f0ae9f76bbd9cd32666f9960ddb45",
+    "detail": {
+     "call_id": "call-3",
+     "tool": "card_history",
+     "query": "card_history",
+     "params": {
+      "as_of": "2016-11-17 19:03:36",
+      "card": "C03042-K1",
+      "lookback_days": 180
+     },
+     "executed_at": "2026-09-24T20:36:43.372674+00:00",
+     "row_count": 69,
+     "result_sha256": "70e42db9ae20daae9fe7d8c8b10834643c82d7986b30fd08c1209362973cc851",
+     "ref": "query:card_history(as_of=2016-11-17 19:03:36, card=C03042-K1, lookback_days=180)#call-3"
+    }
+   },
+   {
+    "seq": 7,
+    "wall": "2026-09-24T20:36:43.374675+00:00",
+    "event": "state",
+    "hash": "06dad715df6a9f969c1adc8228fe24ee4647d5975aa0176937c221c5325e525b",
+    "prev": "2cadf2cd2db10370016428e21dc19c8be7c3a8e2b0de829eccf78638a4fd0ca1",
+    "state": "PATTERN_SCAN",
+    "detail": {
+     "step": 4
+    }
+   },
+   {
+    "seq": 8,
+    "wall": "2026-09-24T20:36:43.374675+00:00",
+    "event": "state",
+    "hash": "0d79156218d46b69c2554b430fb206501f41f7393436979c8e4ba7ab704624ae",
+    "prev": "06dad715df6a9f969c1adc8228fe24ee4647d5975aa0176937c221c5325e525b",
+    "state": "NETWORK",
+    "detail": {
+     "step": 5
+    }
+   },
+   {
+    "seq": 9,
+    "wall": "2026-09-24T20:36:43.930362+00:00",
+    "event": "tool_call",
+    "hash": "544c7be0a79af63bef3c761a6c5f8fe698978d81fa3c85f980942fb9c74e1171",
+    "prev": "0d79156218d46b69c2554b430fb206501f41f7393436979c8e4ba7ab704624ae",
+    "detail": {
+     "call_id": "call-4",
+     "tool": "shared_origin_scan",
+     "query": "shared_origin_scan",
+     "params": {
+      "as_of": "2016-11-17 19:03:36",
+      "card": "C03042-K1",
+      "window_days": 30,
+      "max_degree": 50
+     },
+     "executed_at": "2026-09-24T20:36:43.930362+00:00",
+     "row_count": 95,
+     "result_sha256": "64a6116f11fb81b69ea7b11efb4490744893b9eb46a1fac12633da6aca93fd1a",
+     "ref": "query:shared_origin_scan(as_of=2016-11-17 19:03:36, card=C03042-K1, window_days=30, max_degree=50)#call-4"
+    }
+   },
+   {
+    "seq": 10,
+    "wall": "2026-09-24T20:36:44.348921+00:00",
+    "event": "tool_call",
+    "hash": "3fdeed7ce1c28f8d6b523f15752b5ff31a4ee59a5a82b36760ef8d81a0a0f780",
+    "prev": "544c7be0a79af63bef3c761a6c5f8fe698978d81fa3c85f980942fb9c74e1171",
+    "detail": {
+     "call_id": "call-5",
+     "tool": "shared_device_components",
+     "query": "shared_device_components",
+     "params": {
+      "as_of": "2016-11-17 19:03:36",
+      "seed": "Trident/7.0 | Windows 8.1 | ie 11.0 for desktop | 1680x1050",
+      "window_days": 30,
+      "max_cards": 50,
+      "max_hops": 1
+     },
+     "executed_at": "2026-09-24T20:36:44.348921+00:00",
+     "row_count": 1,
+     "result_sha256": "ae3ff79fb8fab77bc8c73087995b512c144bbc1f2f6f89289158123e3d1e7a27",
+     "ref": "query:shared_device_components(as_of=2016-11-17 19:03:36, seed=Trident/7.0 | Windows 8.1 | ie 11.0 for desktop | 1680x1050, window_days=30, max_cards=50, max_hops=1)#call-5"
+    }
+   },
+   {
+    "seq": 11,
+    "wall": "2026-09-24T20:36:44.348921+00:00",
+    "event": "state",
+    "hash": "bf775801d0e04b9de95557aa17559e4cb9d5046a463354ab725323c40bc0915f",
+    "prev": "3fdeed7ce1c28f8d6b523f15752b5ff31a4ee59a5a82b36760ef8d81a0a0f780",
+    "state": "MEMORY",
+    "detail": {
+     "step": 6
+    }
+   },
+   {
+    "seq": 12,
+    "wall": "2026-09-24T20:36:44.779227+00:00",
+    "event": "tool_call",
+    "hash": "b00c432924439d71784a0feeb18b1b064f15753b417ccb0f30ed2f323e167b84",
+    "prev": "bf775801d0e04b9de95557aa17559e4cb9d5046a463354ab725323c40bc0915f",
+    "detail": {
+     "call_id": "call-6",
+     "tool": "case_history",
+     "query": "case_history",
+     "params": {
+      "as_of": "2016-11-17 19:03:36",
+      "customer": "C03042"
+     },
+     "executed_at": "2026-09-24T20:36:44.779227+00:00",
+     "row_count": 3,
+     "result_sha256": "c5cc1297caf0b56cd8e2d99200a4d3b0f74c94c0d47f4cc3d06a39bb8e60645a",
+     "ref": "query:case_history(as_of=2016-11-17 19:03:36, customer=C03042)#call-6"
+    }
+   },
+   {
+    "seq": 13,
+    "wall": "2026-09-24T20:36:45.211801+00:00",
+    "event": "tool_call",
+    "hash": "97d0ca26cab30160ced7ed3de7fc2cc3619817b0e828eaba560016573d82305a",
+    "prev": "b00c432924439d71784a0feeb18b1b064f15753b417ccb0f30ed2f323e167b84",
+    "detail": {
+     "call_id": "call-7",
+     "tool": "related_cases_structural",
+     "query": "related_cases_structural",
+     "params": {
+      "as_of": "2016-11-17 19:03:36",
+      "card": "C03042-K1",
+      "window_days": 30,
+      "max_device_txns": 500,
+      "top_k": 10
+     },
+     "executed_at": "2026-09-24T20:36:45.211801+00:00",
+     "row_count": 9,
+     "result_sha256": "4bd6e6f7b3bd7534d9f6d80d246213998de2ac2ab1d108491b851860bced8d9f",
+     "ref": "query:related_cases_structural(as_of=2016-11-17 19:03:36, card=C03042-K1, window_days=30, max_device_txns=500, top_k=10)#call-7"
+    }
+   },
+   {
+    "seq": 14,
+    "wall": "2026-09-24T20:36:45.442753+00:00",
+    "event": "tool_call",
+    "hash": "12706dc9721c5607f52c246b163fae6a81cc8b00066c8291563f529ced9f931a",
+    "prev": "97d0ca26cab30160ced7ed3de7fc2cc3619817b0e828eaba560016573d82305a",
+    "detail": {
+     "call_id": "call-8",
+     "tool": "similar_cases",
+     "query": "similar_cases_vector",
+     "params": {
+      "as_of": "2016-11-17 19:03:36",
+      "qv": "<35 values>",
+      "top_k": 20
+     },
+     "executed_at": "2026-09-24T20:36:45.442753+00:00",
+     "row_count": 21,
+     "result_sha256": "e65ab030594d2f3549d56bfe6ea173bb28d495a1d16302576cad0a9a4ec4b67b",
+     "ref": "query:similar_cases_vector(as_of=2016-11-17 19:03:36, qv=<35 values>, top_k=20)#call-8"
+    }
+   },
+   {
+    "seq": 15,
+    "wall": "2026-09-24T20:36:45.443775+00:00",
+    "event": "state",
+    "hash": "ded737e06691582b2d98c68c392cecde0002177310dfb8a2678806970a4ed61b",
+    "prev": "12706dc9721c5607f52c246b163fae6a81cc8b00066c8291563f529ced9f931a",
+    "state": "ASSESS",
+    "detail": {
+     "step": 7,
+     "signature": "Online purchases; from a device not previously seen on this account; other cardholders reported the same device profile this month."
+    }
+   },
+   {
+    "seq": 16,
+    "wall": "2026-09-24T20:36:45.443775+00:00",
+    "event": "state",
+    "hash": "789cdf04ff752ee5ecca9f3d69b94bf8cfa2a9b852d58e038cba677b9a997257",
+    "prev": "ded737e06691582b2d98c68c392cecde0002177310dfb8a2678806970a4ed61b",
+    "state": "DECIDE_INITIAL",
+    "detail": {
+     "step": 8,
+     "p": 0.58,
+     "verdict": "uncertain",
+     "pattern": "card_not_present_new_device",
+     "stop_rule": false
+    }
+   },
+   {
+    "seq": 17,
+    "wall": "2026-09-24T20:36:45.444772+00:00",
+    "event": "policy",
+    "hash": "86f7ac3e140b32801eb8c246846bd1712c417c79189d00665611bd187f704844",
+    "prev": "789cdf04ff752ee5ecca9f3d69b94bf8cfa2a9b852d58e038cba677b9a997257",
+    "detail": {
+     "phase": "initial",
+     "fired": [
+      "R1",
+      "R8"
+     ],
+     "guards": []
+    }
+   },
+   {
+    "seq": 18,
+    "wall": "2026-09-24T20:36:45.444772+00:00",
+    "event": "state",
+    "hash": "9561608731a4b602575024f6f77f2a2002d4383c590fa92b21faf05e48782c66",
+    "prev": "86f7ac3e140b32801eb8c246846bd1712c417c79189d00665611bd187f704844",
+    "state": "EVIDENCE_GATE",
+    "detail": {
+     "step": 9,
+     "request": true
+    }
+   },
+   {
+    "seq": 19,
+    "wall": "2026-09-24T20:36:45.444772+00:00",
+    "event": "state",
+    "hash": "9e855a904f3de8fd5d371b6ffdbe0c10208669f14e79bdf4cf1d294d0e6b0c54",
+    "prev": "9561608731a4b602575024f6f77f2a2002d4383c590fa92b21faf05e48782c66",
+    "state": "REQUEST_EVIDENCE",
+    "detail": {
+     "step": 10
+    }
+   },
+   {
+    "seq": 20,
+    "wall": "2026-09-24T20:36:45.445772+00:00",
+    "event": "state",
+    "hash": "e41d6da11b03eb4903a35de5e72b1b661bb17c4d9c57952773c71cf521fd8cb1",
+    "prev": "9e855a904f3de8fd5d371b6ffdbe0c10208669f14e79bdf4cf1d294d0e6b0c54",
+    "state": "SIMULATE_RESPONSE",
+    "detail": {
+     "step": 11
+    }
+   },
+   {
+    "seq": 21,
+    "wall": "2026-09-24T20:36:45.445772+00:00",
+    "event": "state",
+    "hash": "d717f5838c8858e9d4cb8a0d5237f08c64128fd33e7c83f188d02aaefde13805",
+    "prev": "e41d6da11b03eb4903a35de5e72b1b661bb17c4d9c57952773c71cf521fd8cb1",
+    "state": "REASSESS",
+    "detail": {
+     "step": 12,
+     "response": "no_reply"
+    }
+   },
+   {
+    "seq": 22,
+    "wall": "2026-09-24T20:36:45.445772+00:00",
+    "event": "state",
+    "hash": "7a1babe7017251b4763668ddde6e748bc22e72702375289b4c2f7ab74af7791a",
+    "prev": "d717f5838c8858e9d4cb8a0d5237f08c64128fd33e7c83f188d02aaefde13805",
+    "state": "DECIDE_FINAL",
+    "detail": {
+     "step": 13
+    }
+   },
+   {
+    "seq": 23,
+    "wall": "2026-09-24T20:36:45.445772+00:00",
+    "event": "policy",
+    "hash": "5cdbdaf34ba8eb26b865f967bc67288602d7f1c65a7c802bd8204c0c75fbab0d",
+    "prev": "7a1babe7017251b4763668ddde6e748bc22e72702375289b4c2f7ab74af7791a",
+    "detail": {
+     "phase": "final",
+     "fired": [
+      "R4",
+      "R8"
+     ],
+     "guards": []
+    }
+   },
+   {
+    "seq": 24,
+    "wall": "2026-09-24T20:36:45.660715+00:00",
+    "event": "tool_call",
+    "hash": "3748fb6544314bcba6a501ef9123052348849abdb50d0d730db7c246e18d7606",
+    "prev": "5cdbdaf34ba8eb26b865f967bc67288602d7f1c65a7c802bd8204c0c75fbab0d",
+    "detail": {
+     "call_id": "call-9",
+     "tool": "knowledge_search",
+     "query": "knowledge_search",
+     "params": {
+      "as_of": "2016-11-17 19:03:36",
+      "qv": "<30 values>",
+      "top_k": 6
+     },
+     "executed_at": "2026-09-24T20:36:45.660715+00:00",
+     "row_count": 6,
+     "result_sha256": "06e18ca81f1e62bbf8add669497301f26b2c6d9a7598f785ddaa9c990979f4fb",
+     "ref": "query:knowledge_search(as_of=2016-11-17 19:03:36, qv=<30 values>, top_k=6)#call-9"
+    }
+   },
+   {
+    "seq": 25,
+    "wall": "2026-09-24T20:36:45.663503+00:00",
+    "event": "state",
+    "hash": "27e7f436ed155c619882d7345d2d9fb2dfc9c55486f33ee6fa11e3c2bb6f50cd",
+    "prev": "3748fb6544314bcba6a501ef9123052348849abdb50d0d730db7c246e18d7606",
+    "state": "NARRATE",
+    "detail": {
+     "step": 14,
+     "mode": "template"
+    }
+   },
+   {
+    "seq": 26,
+    "wall": "2026-09-24T20:36:45.664502+00:00",
+    "event": "state",
+    "hash": "81a56412ed774cb8742eced257406e2e213b9311265173463d76c862f967a333",
+    "prev": "27e7f436ed155c619882d7345d2d9fb2dfc9c55486f33ee6fa11e3c2bb6f50cd",
+    "state": "VALIDATE",
+    "detail": {
+     "step": 15
+    }
+   },
+   {
+    "seq": 27,
+    "wall": "2026-09-24T20:36:45.666499+00:00",
+    "event": "validation",
+    "hash": "9000f1f9eda83eb8204076e31447a46769fab25ead89027a12e9e6028a6f0a35",
+    "prev": "81a56412ed774cb8742eced257406e2e213b9311265173463d76c862f967a333",
+    "detail": {
+     "problems": []
+    }
+   },
+   {
+    "seq": 28,
+    "wall": "2026-09-24T20:36:45.667500+00:00",
+    "event": "state",
+    "hash": "22903c29e179b0588a767b34a81a75786b633d1e6a7f793df95561ab53ec888c",
+    "prev": "9000f1f9eda83eb8204076e31447a46769fab25ead89027a12e9e6028a6f0a35",
+    "state": "PERSIST",
+    "detail": {
+     "step": 16
+    }
+   },
+   {
+    "seq": 29,
+    "wall": "2026-09-24T20:36:45.947608+00:00",
+    "event": "write_call",
+    "hash": "4cb2265b7386d9948b77a44ed2255ede220a2502e64709d7880696e4b5ee6661",
+    "prev": "22903c29e179b0588a767b34a81a75786b633d1e6a7f793df95561ab53ec888c",
+    "detail": {
+     "tool": "add_nodes",
+     "vertex_type": "InvestigationCase",
+     "n": 1
+    }
+   },
+   {
+    "seq": 30,
+    "wall": "2026-09-24T20:36:46.392392+00:00",
+    "event": "write_call",
+    "hash": "1497ed9ec44020327140a0a7720d1862ca634ac2b195824fe77c9a37aa4b8f66",
+    "prev": "4cb2265b7386d9948b77a44ed2255ede220a2502e64709d7880696e4b5ee6661",
+    "detail": {
+     "query": "delete_case_edges",
+     "params": {
+      "c": "INV-HHG-015-9fe7682578"
+     }
+    }
+   },
+   {
+    "seq": 31,
+    "wall": "2026-09-24T20:36:46.625408+00:00",
+    "event": "write_call",
+    "hash": "a0318a094f755e01e39978970854ab2c9f537abaa5978b084cc2303e5bddb2d7",
+    "prev": "1497ed9ec44020327140a0a7720d1862ca634ac2b195824fe77c9a37aa4b8f66",
+    "detail": {
+     "tool": "add_nodes",
+     "vertex_type": "EvidenceItem",
+     "n": 9
+    }
+   },
+   {
+    "seq": 32,
+    "wall": "2026-09-24T20:36:46.858197+00:00",
+    "event": "write_call",
+    "hash": "09b4646d7ec231b4eac75001bd2c2af7fb14e691084bfb7b88277ad31bbd9f15",
+    "prev": "a0318a094f755e01e39978970854ab2c9f537abaa5978b084cc2303e5bddb2d7",
+    "detail": {
+     "tool": "add_nodes",
+     "vertex_type": "ActionRecommendation",
+     "n": 7
+    }
+   },
+   {
+    "seq": 33,
+    "wall": "2026-09-24T20:36:47.074345+00:00",
+    "event": "write_call",
+    "hash": "198929ef605a54d216417378803b13e4b5990f5087101d99dccd1289eaaf2e2e",
+    "prev": "09b4646d7ec231b4eac75001bd2c2af7fb14e691084bfb7b88277ad31bbd9f15",
+    "detail": {
+     "tool": "add_edges",
+     "edge_type": "FLAGGED",
+     "n": 1
+    }
+   },
+   {
+    "seq": 34,
+    "wall": "2026-09-24T20:36:47.303060+00:00",
+    "event": "write_call",
+    "hash": "65dbe2a099a5a6a60c478cf3a4a03695ef0ce831a526a1df305bc76b8a5c73c2",
+    "prev": "198929ef605a54d216417378803b13e4b5990f5087101d99dccd1289eaaf2e2e",
+    "detail": {
+     "tool": "add_edges",
+     "edge_type": "INVOLVES",
+     "n": 1
+    }
+   },
+   {
+    "seq": 35,
+    "wall": "2026-09-24T20:36:47.518482+00:00",
+    "event": "write_call",
+    "hash": "9ff5a9e8ddf5068130cd1220daf66e71cb7f9d937eedcd7c6b7e23cb1a0a90b1",
+    "prev": "65dbe2a099a5a6a60c478cf3a4a03695ef0ce831a526a1df305bc76b8a5c73c2",
+    "detail": {
+     "tool": "add_edges",
+     "edge_type": "ON_CARD",
+     "n": 1
+    }
+   },
+   {
+    "seq": 36,
+    "wall": "2026-09-24T20:36:47.737151+00:00",
+    "event": "write_call",
+    "hash": "5ff78fad1e62bcec163295b3cc302b333a229e1efb260981dd77a16628d19d44",
+    "prev": "9ff5a9e8ddf5068130cd1220daf66e71cb7f9d937eedcd7c6b7e23cb1a0a90b1",
+    "detail": {
+     "tool": "add_edges",
+     "edge_type": "CONNECTED_TO",
+     "n": 1
+    }
+   },
+   {
+    "seq": 37,
+    "wall": "2026-09-24T20:36:47.959886+00:00",
+    "event": "write_call",
+    "hash": "6491923816e7d5211aa0fe435e121e194a6fa9ba3197e0fe49fec827f84dcc4e",
+    "prev": "5ff78fad1e62bcec163295b3cc302b333a229e1efb260981dd77a16628d19d44",
+    "detail": {
+     "tool": "add_edges",
+     "edge_type": "FIRST_FRAUD",
+     "n": 1
+    }
+   },
+   {
+    "seq": 38,
+    "wall": "2026-09-24T20:36:48.177616+00:00",
+    "event": "write_call",
+    "hash": "ce03cbbe81407023df3969e0e0eed181a761fa9d04d4febf139ad80f50f9e17b",
+    "prev": "6491923816e7d5211aa0fe435e121e194a6fa9ba3197e0fe49fec827f84dcc4e",
+    "detail": {
+     "tool": "add_edges",
+     "edge_type": "HAS_PATTERN",
+     "n": 1
+    }
+   },
+   {
+    "seq": 39,
+    "wall": "2026-09-24T20:36:48.394061+00:00",
+    "event": "write_call",
+    "hash": "42e00f2df64850eb15294f8f9178c7fbc3d80dda9fbf45334f3a2c5c91dfa349",
+    "prev": "ce03cbbe81407023df3969e0e0eed181a761fa9d04d4febf139ad80f50f9e17b",
+    "detail": {
+     "tool": "add_edges",
+     "edge_type": "NAMES_DEVICE",
+     "n": 2
+    }
+   },
+   {
+    "seq": 40,
+    "wall": "2026-09-24T20:36:48.610529+00:00",
+    "event": "write_call",
+    "hash": "fb43007e01071c4adec1dbfa1eb56818e56a8f5d7c8da714cf3d59061fdc3b7c",
+    "prev": "42e00f2df64850eb15294f8f9178c7fbc3d80dda9fbf45334f3a2c5c91dfa349",
+    "detail": {
+     "tool": "add_edges",
+     "edge_type": "SIMILAR_TO",
+     "n": 3
+    }
+   },
+   {
+    "seq": 41,
+    "wall": "2026-09-24T20:36:48.828642+00:00",
+    "event": "write_call",
+    "hash": "12134ac3e9b5dfe6e10145edc75d217b40b15cd90a9b5ceb77b7b82dc2392caf",
+    "prev": "fb43007e01071c4adec1dbfa1eb56818e56a8f5d7c8da714cf3d59061fdc3b7c",
+    "detail": {
+     "tool": "add_edges",
+     "edge_type": "HAS_EVIDENCE",
+     "n": 9
+    }
+   },
+   {
+    "seq": 42,
+    "wall": "2026-09-24T20:36:49.052012+00:00",
+    "event": "write_call",
+    "hash": "e2be96a91fff9e3d5f816af41968d4155945cf4e97dd7c7374f1a6f7c8d35009",
+    "prev": "12134ac3e9b5dfe6e10145edc75d217b40b15cd90a9b5ceb77b7b82dc2392caf",
+    "detail": {
+     "tool": "add_edges",
+     "edge_type": "HAS_ACTION",
+     "n": 7
+    }
+   },
+   {
+    "seq": 43,
+    "wall": "2026-09-24T20:36:49.274604+00:00",
+    "event": "write_call",
+    "hash": "bb73b6f4f9f5ad436628ee7f11dd8e016a402909e3fa74254de094244938c36c",
+    "prev": "e2be96a91fff9e3d5f816af41968d4155945cf4e97dd7c7374f1a6f7c8d35009",
+    "detail": {
+     "tool": "add_edges",
+     "edge_type": "EVIDENCE_ABOUT",
+     "n": 1
+    }
+   },
+   {
+    "seq": 44,
+    "wall": "2026-09-24T20:36:49.496903+00:00",
+    "event": "write_call",
+    "hash": "897b3a39fba4bf935d797aa0232a1f9768b146c724d6c866534bf9bb46918a0b",
+    "prev": "bb73b6f4f9f5ad436628ee7f11dd8e016a402909e3fa74254de094244938c36c",
+    "detail": {
+     "tool": "add_edges",
+     "edge_type": "EVIDENCE_ABOUT",
+     "n": 7
+    }
+   },
+   {
+    "seq": 45,
+    "wall": "2026-09-24T20:36:49.713662+00:00",
+    "event": "write_call",
+    "hash": "5946c2ac4d35617e799ba782385385241c0a7adeaa079b9896e43bab9fc56afd",
+    "prev": "897b3a39fba4bf935d797aa0232a1f9768b146c724d6c866534bf9bb46918a0b",
+    "detail": {
+     "tool": "add_edges",
+     "edge_type": "EVIDENCE_ABOUT",
+     "n": 3
+    }
+   },
+   {
+    "seq": 46,
+    "wall": "2026-09-24T20:36:49.930025+00:00",
+    "event": "write_call",
+    "hash": "90dcc1912dd6d964d0b6f7eac06f8f8f4e8ace9eab43520e1c32ce9c1aef6bc6",
+    "prev": "5946c2ac4d35617e799ba782385385241c0a7adeaa079b9896e43bab9fc56afd",
+    "detail": {
+     "tool": "add_edges",
+     "edge_type": "CITES_RULE",
+     "n": 9
+    }
+   },
+   {
+    "seq": 47,
+    "wall": "2026-09-24T20:36:50.677688+00:00",
+    "event": "write_call",
+    "hash": "fcd9013833f19b729c3b034b0db8befcc77da6c47c600610ca460ba499628529",
+    "prev": "90dcc1912dd6d964d0b6f7eac06f8f8f4e8ace9eab43520e1c32ce9c1aef6bc6",
+    "detail": {
+     "query": "verify_investigation_case",
+     "params": {
+      "c": "INV-HHG-015-9fe7682578"
+     }
+    }
+   },
+   {
+    "seq": 48,
+    "wall": "2026-09-24T20:36:50.678707+00:00",
+    "event": "persist",
+    "hash": "d900d14ca056ad6c3dbf07e4326ce401679506e89345e83fa140e0c1cb37bf76",
+    "prev": "fcd9013833f19b729c3b034b0db8befcc77da6c47c600610ca460ba499628529",
+    "detail": {
+     "graph_case_id": "INV-HHG-015-9fe7682578",
+     "answer_sha256": "249f8ef4a8911838bb667c4d582112a83fa4dcfb6f6ddd2ca5717c0609ab95ad",
+     "edges": {
+      "FLAGGED": 1,
+      "INVOLVES": 1,
+      "ON_CARD": 1,
+      "CONNECTED_TO": 1,
+      "FIRST_FRAUD": 1,
+      "HAS_PATTERN": 1,
+      "NAMES_DEVICE": 2,
+      "SIMILAR_TO": 3,
+      "HAS_EVIDENCE": 9,
+      "HAS_ACTION": 7
+     },
+     "read_back": "verified"
+    }
+   },
+   {
+    "seq": 49,
+    "wall": "2026-09-24T20:36:50.685514+00:00",
+    "event": "state",
+    "hash": "596496a4ad415eaf3cbcf46aa6b435df2504842ac2851e4ed0c413a5f3c41fac",
+    "prev": "d900d14ca056ad6c3dbf07e4326ce401679506e89345e83fa140e0c1cb37bf76",
+    "state": "DONE",
+    "detail": {
+     "step": 17,
+     "written_to_graph": true
+    }
+   }
+  ]
+ },
+ "persist": {
+  "graph_case_id": "INV-HHG-015-9fe7682578",
+  "edges": {
+   "FLAGGED": 1,
+   "INVOLVES": 1,
+   "ON_CARD": 1,
+   "CONNECTED_TO": 1,
+   "FIRST_FRAUD": 1,
+   "HAS_PATTERN": 1,
+   "NAMES_DEVICE": 2,
+   "SIMILAR_TO": 3,
+   "HAS_EVIDENCE": 9,
+   "HAS_ACTION": 7
+  },
+  "read_back": "verified",
+  "answer_sha256_matches_file": true
+ }
+}
