@@ -1,0 +1,3 @@
+# Deployed to Vercel as a static site (deterministic Copilot).
+# The optional LLM function in api/ is opt-in and not yet verified on Vercel; see README.md.
+api

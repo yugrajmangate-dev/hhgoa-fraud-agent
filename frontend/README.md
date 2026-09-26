@@ -31,9 +31,26 @@ Each group shows at most 24 nodes; the rest are counted in a "+N more" node and 
 
 ### Evidence Copilot
 
-- Answers are assembled from the selected case's answer file, trace and audit log by `src/lib/copilot/deterministic.ts`. No model is called.
-- Case data is deep-frozen when loaded, and providers return text only, so the copilot cannot change verdicts, probabilities, actions, routes or case files. Requests to change them are refused.
-- `src/lib/copilot/types.ts` defines a `CopilotProvider` interface for future LLM use. `ServerLlmProvider` in `src/lib/copilot/index.ts` is a disabled placeholder: it makes no calls and is not wired into the UI. Any future LLM must be called through a server-side endpoint that holds the API key; keys must never reach the browser.
+The Copilot always computes the **grounded deterministic** answer first (`src/lib/copilot/deterministic.ts`): it is assembled from the selected case's answer file, trace and audit log. An optional server-side LLM can replace it with a written explanation; without one, nothing changes.
+
+The panel shows which mode is active:
+- **LLM unavailable — deterministic fallback**: no key on the server, a static host with no `/api/copilot`, or any error. Each fallback answer names the reason (no key, timeout, quota, rate limit, provider error, network, or an answer that failed validation).
+- **LLM enabled — evidence-grounded explanation**: the server has a key and the model's answer passed validation.
+
+Guarantees, enforced in code and covered by tests:
+- **Read-only.** Case data is deep-frozen in the browser. The model returns text only, and the recorded verdict, probability and route are always appended from the case file, not from the model. Requests to change a decision ("mark as fraud", "change the verdict", "approve", "delete the SAR", …) are refused in the browser before any network call, and again on the server.
+- **The key stays on the server.** `OPENROUTER_API_KEY` and `OPENROUTER_MODEL` are read only by `server/copilot/` (the Vite dev/preview middleware, or the Vercel function in `api/copilot.ts`). Browser code only calls this app's own `/api/copilot`. `vite.config.ts` refuses to run if a key-like `VITE_*` variable is set, and a test checks that `src/` never reads server settings.
+- **Only sanitized evidence is sent.** The server loads the case bundle itself (it never trusts context from the browser) and sends a whitelist of fields: trigger, decision, evidence claims and refs, actions, `what_changed`, `stop_reason`, SAR decision, scorer-family claims, graph-call refs, entity IDs and audit status. It sends no audit hashes, file paths, raw dataset rows, knowledge text, credentials or hostnames, and it aborts if the context matches a secret/URL/hostname pattern.
+- **Validated or discarded.** The model must reply with JSON `{answer, citations}`. Every citation must be a real provenance ref or context field, the answer may not introduce decimal numbers that aren't in the evidence (such as a different probability), may not state a different verdict, and may not contain URLs. Anything else falls back to the deterministic answer. The provider call times out after 15 s (25 s end to end).
+
+To enable it locally, create `frontend/.env.local` (git-ignored; see `.env.example`):
+
+```bash
+OPENROUTER_API_KEY=...        # your OpenRouter key; never use a VITE_ prefix
+OPENROUTER_MODEL=...          # optional; defaults to openrouter/auto
+```
+
+Then restart `npm run dev` or `npm run preview`. The Vercel deployment is static and runs the Copilot in deterministic mode: `.vercelignore` excludes the opt-in `api/copilot.ts` function, which has not been verified on Vercel yet. To try LLM mode there, remove `api` from `.vercelignore` and set the two variables as Vercel environment variables (server-side only), then check that `/api/copilot` answers before relying on it. On Netlify or any static host there is no endpoint, so the Copilot stays in deterministic mode.
 
 ## Data
 
@@ -70,15 +87,16 @@ Open `http://localhost:5173/#HHG-017` or `#HHG-014` to go straight to a demo cas
 
 ```bash
 cd /c/Users/yugra/source/hhgoa-fraud-agent/frontend
-npm run build        # type-check (tsc --noEmit) + production build into dist/
-npm run preview      # serve dist/ at http://localhost:4173/
+npm run build        # type-check browser + server code, then production build into dist/
+npm run preview      # serve dist/ (and /api/copilot) at http://localhost:4173/
+npm test             # vitest: Copilot fallback, provider, refusal, error and key-exposure tests
 ```
 
 `vite.config.ts` sets `base: "./"`, so `dist/` works from any static host or sub-path.
 
 ## Deploy
 
-The build is a static site: `dist/` holds `index.html`, the assets and `data/`. There is no server code and there are no environment variables.
+The build is a static site: `dist/` holds `index.html`, the assets and `data/`, and needs no environment variables. The optional LLM endpoint would need a server function (`api/copilot.ts`, opt-in); without it the app runs fully static in deterministic mode.
 
 - **Vercel:** import the repository and set **Root Directory** to `frontend`. `vercel.json` sets the build command (`npm run build`) and output directory (`dist`).
 - **Netlify:** set **Base directory** to `frontend`. `netlify.toml` sets `npm run build`, publish directory `dist` and Node 22.
@@ -96,7 +114,10 @@ frontend/
   src/lib/data.ts             fetch + deep-freeze of case bundles
   src/lib/graph.ts            graph from recorded relationships only; deterministic lane layout
   src/lib/timeline.ts         audit events -> phases
-  src/lib/copilot/            provider interface, deterministic provider, disabled LLM placeholder
+  src/lib/copilot/            deterministic provider, hybrid provider (calls /api/copilot), shared guard and API types
+  server/copilot/             server-only: env config, sanitized context, OpenRouter client, validation, Vite middleware
+  api/copilot.ts              opt-in Vercel function for /api/copilot (excluded by .vercelignore)
+  tests/                      vitest suites
   src/styles.css              dark navy/graphite theme
 ```
 

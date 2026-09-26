@@ -27,11 +27,24 @@ export interface AnswerBlock {
   bullets?: { text: string; ref?: string; simulated?: boolean }[];
 }
 
+/**
+ * deterministic: templated from the case data (default when no LLM is configured);
+ * llm: server-side model explanation that passed validation;
+ * fallback: the LLM was tried but failed, so the deterministic answer is shown;
+ * refused: a request to change the decision, which is never sent to any model.
+ */
+export type AnswerMode = "deterministic" | "llm" | "fallback" | "refused";
+
 export interface CopilotAnswer {
   intent: IntentId | "unsupported";
   blocks: AnswerBlock[];
   citations: Citation[];
   provider: string;
+  mode: AnswerMode;
+  /** Why the LLM answer was not used (for mode "fallback"). */
+  fallbackReason?: string;
+  /** Model id reported by the server (for mode "llm"). */
+  model?: string;
 }
 
 /**

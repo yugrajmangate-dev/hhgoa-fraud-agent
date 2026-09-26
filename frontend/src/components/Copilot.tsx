@@ -1,6 +1,27 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import type { CaseBundle } from "../types";
-import { createProvider, QUICK_QUESTIONS, type CopilotAnswer, type IntentId } from "../lib/copilot";
+import {
+  createProvider,
+  QUICK_QUESTIONS,
+  STATUS_FALLBACK,
+  STATUS_LLM,
+  type CopilotAnswer,
+  type CopilotStatus,
+  type IntentId,
+} from "../lib/copilot";
+
+function modeLabel(a: CopilotAnswer): { text: string; cls: string } {
+  switch (a.mode) {
+    case "llm":
+      return { text: `${STATUS_LLM}${a.model ? ` (${a.model})` : ""}`, cls: "mode-llm" };
+    case "fallback":
+      return { text: `${STATUS_FALLBACK}${a.fallbackReason ? `: ${a.fallbackReason}` : ""}`, cls: "mode-fallback" };
+    case "refused":
+      return { text: "Refused: decision data is read-only (not sent to any model)", cls: "mode-refused" };
+    default:
+      return { text: "Grounded deterministic answer", cls: "mode-det" };
+  }
+}
 import { Ref, Sim } from "./ui";
 
 interface Turn {
@@ -16,6 +37,17 @@ export function Copilot({ b }: { b: CaseBundle }) {
   const [draft, setDraft] = useState("");
   const nextId = useRef(1);
   const endRef = useRef<HTMLDivElement>(null);
+  const [status, setStatus] = useState<CopilotStatus | null>(null);
+
+  useEffect(() => {
+    let live = true;
+    void provider.refreshStatus().then((s) => {
+      if (live) setStatus(s);
+    });
+    return () => {
+      live = false;
+    };
+  }, [provider]);
 
   useEffect(() => {
     setTurns([]);
@@ -48,10 +80,16 @@ export function Copilot({ b }: { b: CaseBundle }) {
     <section className="panel copilot" aria-labelledby="copilot-title">
       <header className="panel-head">
         <div>
-          <h2 id="copilot-title">Evidence Copilot — grounded deterministic mode</h2>
+          <h2 id="copilot-title">Evidence Copilot</h2>
+          <p className={`copilot-status ${status?.llm ? "is-llm" : "is-fallback"}`} role="status">
+            <span className="dot" aria-hidden="true" />
+            {status === null ? "Checking for a server-side LLM…" : status.llm ? `${STATUS_LLM}${status.model ? ` · ${status.model}` : ""}` : STATUS_FALLBACK}
+          </p>
           <p className="panel-kicker">
-            Answers are assembled from {b.case_id}'s answer file, trace and audit log. No language model is called, and the copilot
-            cannot change verdicts, probabilities, actions, routes or case files.
+            {status?.llm
+              ? `A server-side model explains ${b.case_id}'s recorded evidence only; answers that fail validation fall back to the grounded deterministic mode.`
+              : `Grounded deterministic mode: answers are assembled from ${b.case_id}'s answer file, trace and audit log.`}{" "}
+            The copilot cannot change verdicts, probabilities, actions, routes or case files.
           </p>
         </div>
       </header>
@@ -76,6 +114,7 @@ export function Copilot({ b }: { b: CaseBundle }) {
                 <p className="muted">Reading the case artifacts…</p>
               ) : (
                 <>
+                  <p className={`ans-mode ${modeLabel(t.answer).cls}`}>{modeLabel(t.answer).text}</p>
                   {t.answer.blocks.map((blk, i) => (
                     <div key={i} className={`ans-block ${blk.simulated ? "is-sim" : ""}`}>
                       <p>

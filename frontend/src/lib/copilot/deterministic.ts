@@ -1,6 +1,7 @@
 import { highestRoute, plural, prob, signed, TRIGGER_LABEL, isSimulatedEvidence } from "../format";
 import type { AnswerBlock, Citation, CopilotAnswer, CopilotContext, CopilotProvider, IntentId } from "./types";
 import { QUICK_QUESTIONS } from "./types";
+import { isChangeRequest } from "./guard";
 
 // Grounded deterministic mode: every sentence is assembled from fields of the selected case's
 // answer file, trace and audit log. No model is called and nothing is generated beyond templates.
@@ -12,9 +13,6 @@ const KEYWORDS: [IntentId, RegExp][] = [
   ["graph_evidence", /\b(graph|evidence|support\w*|quer\w*|call|provenance)\b/i],
   ["flagged", /\b(flag\w*|why|trigger\w*|alert|start)\b/i],
 ];
-
-// Requests to alter the decision are refused rather than matched to an explanation.
-const CHANGE_REQUEST = /\b(mark|change|set|update|override|overrule|approve|reject|delete|modify|edit|rewrite|flip|reclassify|escalate it|block it)\b/i;
 
 export function matchIntent(question: string): IntentId | null {
   const exact = QUICK_QUESTIONS.find((q) => q.label.toLowerCase() === question.trim().toLowerCase());
@@ -203,10 +201,11 @@ export class DeterministicProvider implements CopilotProvider {
   readonly label = "Evidence Copilot — grounded deterministic mode";
 
   async answer(question: string, intent: IntentId | null, ctx: CopilotContext): Promise<CopilotAnswer> {
-    if (!intent && CHANGE_REQUEST.test(question)) {
+    if (isChangeRequest(question, intent)) {
       return {
         intent: "unsupported",
         provider: this.id,
+        mode: "refused",
         citations: [],
         blocks: [
           {
@@ -223,6 +222,7 @@ export class DeterministicProvider implements CopilotProvider {
       return {
         intent: "unsupported",
         provider: this.id,
+        mode: "deterministic",
         citations: [],
         blocks: [
           {
@@ -234,6 +234,6 @@ export class DeterministicProvider implements CopilotProvider {
       };
     }
     const [blocks, citations] = HANDLERS[id](ctx);
-    return { intent: id, blocks, citations, provider: this.id };
+    return { intent: id, blocks, citations, provider: this.id, mode: "deterministic" };
   }
 }
